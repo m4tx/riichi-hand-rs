@@ -1,0 +1,66 @@
+name: Rust CI
+
+on:
+  push:
+    branches: [ '**' ]
+  pull_request:
+    branches: [ '**' ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: cargo build --verbose
+      - name: Run tests
+        run: cargo test --verbose
+
+  build_raster_renderer:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: cargo build --verbose --features raster-renderer
+      - name: Run tests
+        run: cargo test --verbose --features raster-renderer
+
+  build_fluffy_stuff_tile_sets:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: cargo build --verbose --features raster-renderer,fluffy-stuff-tile-sets
+      - name: Run tests
+        run: cargo test --verbose --features raster-renderer,fluffy-stuff-tile-sets
+
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: rustup component add clippy
+      - uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --all-features
+
+  rustfmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          components: rustfmt
+      - name: Run rustfmt check
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: -- --check
