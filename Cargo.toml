@@ -18,11 +18,11 @@ exclude = [
 ]
 
 [dependencies]
-image = { version = "0.23", default-features = false, optional = true }
+image = { version = "0.24", default-features = false, optional = true }
 lazy_static = { version = "1.4.0", optional = true }
 
 [build-dependencies]
-image = { version = "0.23", default-features = false, optional = true }
+image = { version = "0.24", default-features = false, optional = true }
 rayon = { version = "1.5.1", optional = true }
 resvg = { version = "0.20.0", optional = true }
 tiny-skia = { version = "0.6.2", optional = true }
