@@ -69,7 +69,7 @@ impl<'a, T: TileSet> RasterRenderer<'a, T> {
             let (width, height) = self.calculate_group_size(group);
             let mut sub_image =
                 imageops::crop(image, start_x, image.height() - height, width, height);
-            self.render_group(group, &mut sub_image);
+            self.render_group(group, &mut *sub_image);
 
             start_x += width + self.group_gap();
         }
@@ -86,7 +86,7 @@ impl<'a, T: TileSet> RasterRenderer<'a, T> {
 
             let mut sub_image =
                 imageops::crop(image, start_x, image.height() - height, width, height);
-            self.render_tile(tile, &mut sub_image);
+            self.render_tile(tile, &mut *sub_image);
 
             last_placement = tile.placement;
             start_x += width + self.tile_gap();
