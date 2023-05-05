@@ -47,6 +47,7 @@ fn main() {
 
 * [chombot](https://github.com/riichi/chombot) - Discord bot for Krakow Chombo
   Club's Discord server
+* [chombo-gen](https://github.com/m4tx/chombo-gen) - Web-based hand renderer
 
 ## License
 
