@@ -151,6 +151,16 @@ impl TilePlacement {
     }
 }
 
+impl Display for TilePlacement {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TilePlacement::Normal => write!(f, "normal"),
+            TilePlacement::Rotated => write!(f, "rotated"),
+            TilePlacement::RotatedAndShifted => write!(f, "rotated and shifted"),
+        }
+    }
+}
+
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 /// Representation of a tile on a hand (tile and rotation).
 pub struct HandTile {
@@ -165,6 +175,12 @@ impl HandTile {
     /// Returns new hand tile using given tile object and placement.
     pub fn new(tile: Tile, placement: TilePlacement) -> Self {
         Self { tile, placement }
+    }
+}
+
+impl Display for HandTile {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} {}", self.placement, self.tile)
     }
 }
 

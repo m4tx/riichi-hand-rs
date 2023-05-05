@@ -65,7 +65,10 @@ mod tile_set_render {
         let out_dir = env::var_os("OUT_DIR").unwrap();
 
         for tile_set in TILE_SETS {
-            let tile_set_path = Path::new(&out_dir).join("tilesets").join(tile_set);
+            let tile_set_path = Path::new(&out_dir)
+                .join("tilesets")
+                .join("FluffyStuff")
+                .join(tile_set);
             fs::create_dir_all(&tile_set_path).expect("could not create tile set output directory");
 
             render_and_save(tile_set, &tile_set_path, "Front", BACKGROUND_TILE_MARGIN);
@@ -78,7 +81,10 @@ mod tile_set_render {
     }
 
     fn render_and_save(tile_set: &str, tile_set_path: &Path, name: &str, margin: f32) {
-        let back_tile = render_svg(&format!("tilesets/{}/{}.svg", tile_set, name), margin);
+        let back_tile = render_svg(
+            &format!("tilesets/FluffyStuff/{}/{}.svg", tile_set, name),
+            margin,
+        );
         let dest_path = Path::new(&tile_set_path).join(format!("{}.png", name));
         back_tile.save(dest_path).expect("could not save file");
     }

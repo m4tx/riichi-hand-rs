@@ -22,7 +22,7 @@
 //! use riichi_hand::raster_renderer::{RasterRenderer, RenderOptions};
 //!
 //! let hand = HandParser::parse("123m123p123sEESS").unwrap();
-//! let image = RasterRenderer::render(&hand, &*YELLOW_FLUFFY_STUFF_TILE_SET, RenderOptions::default());
+//! let image = RasterRenderer::render(&hand, &*YELLOW_FLUFFY_STUFF_TILE_SET, RenderOptions::default()).unwrap();
 //! image.save("/tmp/hand.png").unwrap();
 //! ```
 
