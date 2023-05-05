@@ -14,6 +14,7 @@
 //! * `raster-renderer` - renderer for hands that outputs raster images
 //! * `fluffy-stuff-tile-sets` - ready-to-use tile sets based on FluffyStuff's work. Greatly
 //!     increases build time
+//! * `martin-persson-tile-sets` - ready-to-use tile sets based on Martin Persson's work
 //!
 //! ## Example
 //! ```
