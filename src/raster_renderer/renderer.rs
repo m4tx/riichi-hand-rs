@@ -42,7 +42,8 @@ pub struct RasterRenderer<'a, T: TileSet> {
     options: RenderOptions,
 }
 
-type ImageType = RgbaImage;
+/// Alias for the return image type of [RasterRenderer::render].
+pub type ImageType = RgbaImage;
 /// Result of [RasterRenderer::render].
 pub type HandRenderResult = Result<ImageType, HandRenderError>;
 

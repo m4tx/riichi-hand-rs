@@ -1,5 +1,8 @@
-pub use renderer::{HandRenderResult, RasterRenderer, RenderOptions};
-pub use tile_set::{SimpleTileSet, TileImageResult, TileSet, TileSetCreationError, TwoPartTileSet};
+pub use renderer::{HandRenderError, HandRenderResult, ImageType, RasterRenderer, RenderOptions};
+pub use tile_set::{
+    SimpleTileSet, TileImageResult, TileImageRetrieveError, TileSet, TileSetCreationError,
+    TwoPartTileSet,
+};
 
 #[cfg(feature = "fluffy-stuff-tile-sets")]
 /// Ready-to-use tile sets based on FluffyStuff's tile images.
