@@ -40,6 +40,16 @@ jobs:
       - name: Run tests
         run: cargo test --verbose --features raster-renderer,fluffy-stuff-tile-sets
 
+  build_martin_persson_tile_sets:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build
+        run: cargo build --verbose --features raster-renderer,martin-persson-tile-sets
+      - name: Run tests
+        run: cargo test --verbose --features raster-renderer,martin-persson-tile-sets
+
   clippy:
     runs-on: ubuntu-latest
     steps:

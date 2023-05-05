@@ -29,6 +29,7 @@ tiny-skia = { version = "0.6.3", optional = true }
 usvg = { version = "0.23.0", optional = true }
 
 [features]
-default = ["raster-renderer", "fluffy-stuff-tile-sets"]
+default = ["raster-renderer", "fluffy-stuff-tile-sets", "martin-persson-tile-sets"]
 raster-renderer = ["image"]
 fluffy-stuff-tile-sets = ["image/png", "rayon", "resvg", "tiny-skia", "usvg", "lazy_static"]
+martin-persson-tile-sets = ["image/png", "lazy_static"]

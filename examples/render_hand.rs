@@ -15,7 +15,10 @@ fn main() {
 
     println!("Rendering the hand...");
     let image = RasterRenderer::render(&hand, tile_set, RenderOptions::default());
-    image.save(path.trim()).expect("could not save image");
+    image
+        .unwrap()
+        .save(path.trim())
+        .expect("could not save image");
     println!("Successfully rendered the hand");
 }
 
