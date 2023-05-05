@@ -18,11 +18,14 @@ macro_rules! load_tile_set {
 
 lazy_static! {
     /// Tile set based on the FluffyStuff's tiles - Yellow version.
-    pub static ref YELLOW_FLUFFY_STUFF_TILE_SET: TwoPartTileSet = load_tile_set!(concat!(env!("OUT_DIR"), "/tilesets/FluffyStuff/"), "Yellow");
+    pub static ref YELLOW_FLUFFY_STUFF_TILE_SET: TwoPartTileSet =
+        load_tile_set!(concat!(env!("OUT_DIR"), "/tilesets/FluffyStuff/"), "Yellow");
 
     /// Tile set based on the FluffyStuff's tiles - Red version.
-    pub static ref RED_FLUFFY_STUFF_TILE_SET: TwoPartTileSet = load_tile_set!(concat!(env!("OUT_DIR"), "/tilesets/FluffyStuff/"), "Red");
+    pub static ref RED_FLUFFY_STUFF_TILE_SET: TwoPartTileSet =
+        load_tile_set!(concat!(env!("OUT_DIR"), "/tilesets/FluffyStuff/"), "Red");
 
     /// Tile set based on the FluffyStuff's tiles - Black version.
-    pub static ref BLACK_FLUFFY_STUFF_TILE_SET: TwoPartTileSet = load_tile_set!(concat!(env!("OUT_DIR"), "/tilesets/FluffyStuff/"), "Black");
+    pub static ref BLACK_FLUFFY_STUFF_TILE_SET: TwoPartTileSet =
+        load_tile_set!(concat!(env!("OUT_DIR"), "/tilesets/FluffyStuff/"), "Black");
 }

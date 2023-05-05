@@ -16,5 +16,6 @@ macro_rules! load_tile_set {
 
 lazy_static! {
     /// Tile set based on the Martin Persson's tiles
-    pub static ref MARTIN_PERSSON_TILE_SET: SimpleTileSet = load_tile_set!("../../tilesets/", "MartinPersson");
+    pub static ref MARTIN_PERSSON_TILE_SET: SimpleTileSet =
+        load_tile_set!("../../tilesets/", "MartinPersson");
 }
