@@ -28,6 +28,34 @@ pub trait TileSet {
     fn tile_height(&self) -> u32;
 }
 
+impl<T: TileSet + ?Sized> TileSet for &T {
+    fn tile_image(&self, hand_tile: &HandTile) -> TileImageResult {
+        T::tile_image(self, hand_tile)
+    }
+
+    fn tile_width(&self) -> u32 {
+        T::tile_width(self)
+    }
+
+    fn tile_height(&self) -> u32 {
+        T::tile_height(self)
+    }
+}
+
+impl<T: TileSet + ?Sized> TileSet for Box<T> {
+    fn tile_image(&self, hand_tile: &HandTile) -> TileImageResult {
+        T::tile_image(self, hand_tile)
+    }
+
+    fn tile_width(&self) -> u32 {
+        T::tile_width(self)
+    }
+
+    fn tile_height(&self) -> u32 {
+        T::tile_height(self)
+    }
+}
+
 #[derive(Clone, Debug)]
 /// An error that occurs when calling [TileSet::tile_image].
 pub enum TileImageRetrieveError {
@@ -255,10 +283,12 @@ impl TileSet for TwoPartTileSet {
 mod tests {
     use std::collections::HashMap;
 
+    use crate::HandTile;
     use image::ImageBuffer;
 
-    use crate::raster_renderer::{TileSetCreationError, TwoPartTileSet};
-    use crate::tiles::{ALL_TILES, ANY};
+    use crate::raster_renderer::{TileSet, TileSetCreationError, TwoPartTileSet};
+    use crate::tiles::{ALL_TILES, ANY, II_PIN};
+    use crate::TilePlacement::Normal;
 
     #[test]
     fn should_return_tile_missing_error() {
@@ -268,6 +298,35 @@ mod tests {
             TileSetCreationError::TileMissing(_) => assert!(true),
             _ => assert!(false),
         }
+    }
+
+    #[test]
+    fn should_work_with_boxes() {
+        let buffer1 = ImageBuffer::new(16, 16);
+        let mut map = HashMap::new();
+        for tile in ALL_TILES {
+            map.insert(tile, buffer1.clone());
+        }
+
+        let result: Box<dyn TileSet> = Box::new(TwoPartTileSet::new(buffer1, map).unwrap());
+        assert_eq!(TileSet::tile_height(&result), 16);
+        assert_eq!(TileSet::tile_width(&result), 16);
+        assert!(TileSet::tile_image(&result, &HandTile::new(II_PIN, Normal)).is_ok());
+    }
+
+    #[test]
+    fn should_work_with_boxed_references() {
+        let buffer1 = ImageBuffer::new(16, 16);
+        let mut map = HashMap::new();
+        for tile in ALL_TILES {
+            map.insert(tile, buffer1.clone());
+        }
+
+        let result = TwoPartTileSet::new(buffer1, map).unwrap();
+        let result: Box<&dyn TileSet> = Box::new(&result);
+        assert_eq!(TileSet::tile_height(&result), 16);
+        assert_eq!(TileSet::tile_width(&result), 16);
+        assert!(TileSet::tile_image(&result, &HandTile::new(II_PIN, Normal)).is_ok());
     }
 
     #[test]
