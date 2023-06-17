@@ -5,6 +5,7 @@ riichi-hand-rs
 [![Documentation](https://docs.rs/riichi_hand/badge.svg)](https://docs.rs/riichi_hand)
 [![Build Status](https://github.com/m4tx/riichi-hand-rs/workflows/Rust%20CI/badge.svg)](https://github.com/m4tx/riichi-hand-rs/actions)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/m4tx/riichi-hand-rs/blob/master/LICENSE)
+[![codecov](https://codecov.io/gh/m4tx/riichi-hand-rs/branch/master/graph/badge.svg)](https://codecov.io/gh/m4tx/riichi-hand-rs)
 
 A collection of utilities for working with Riichi Mahjong player hands to use
 with Rust programming language.
