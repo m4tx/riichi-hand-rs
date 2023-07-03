@@ -56,3 +56,6 @@ pub mod raster_renderer;
 
 /// Constant objects that represent all valid tiles
 pub mod tiles;
+
+/// Storing the number of han and fu, and calculating winning points
+pub mod points;

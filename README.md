@@ -17,6 +17,9 @@ This currently includes:
   as `123m456p_7*77z`
 * Renderer that allows to draw a hand to a raster image (along with a few
   ready-to-use sets of tile images)
+* Points calculator (i.e. scoring table and an ability to
+  calculate [Aotenjou](https://riichi.wiki/Aotenjou) points with optional
+  `BigInt` support)
 
 ## Usage
 
