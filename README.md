@@ -27,7 +27,7 @@ Add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-riichi_hand = "0.4.0"
+riichi_hand = "0.5.0"
 ```
 
 On the feature flags overview, please refer to
