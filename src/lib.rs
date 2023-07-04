@@ -25,7 +25,8 @@
 //!
 //! let hand = HandParser::parse("123m123p123sEESS").unwrap();
 //! let image = RasterRenderer::render(&hand, &*YELLOW_FLUFFY_STUFF_TILE_SET, RenderOptions::default()).unwrap();
-//! image.save("/tmp/hand.png").unwrap();
+//! image.save("hand.png").unwrap();
+//! # std::fs::remove_file("hand.png").unwrap();
 //! ```
 
 #![deny(

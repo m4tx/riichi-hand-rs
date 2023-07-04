@@ -2,98 +2,129 @@ name: Rust CI
 
 on:
   push:
-    branches: [ '**' ]
-  pull_request:
-    branches: [ '**' ]
 
 env:
   CARGO_TERM_COLOR: always
 
+# See: https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#concurrency.
+# This will ensure that only one commit will be running tests at a time on each PR.
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
   build:
-    runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        rust: [ "stable", "nightly" ]
+        os: [ ubuntu-latest, macos-latest, windows-2019 ]
+        features: [ "", "raster-renderer", "raster-renderer,fluffy-stuff-tile-sets", "raster-renderer,martin-persson-tile-sets" ]
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-debug-${{ hashFiles('**/Cargo.toml') }}
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+
       - name: Build
-        run: cargo build --verbose
-      - name: Run tests
-        run: cargo test --verbose
+        run: cargo +${{ matrix.rust }} build --features=${{ matrix.features }}
 
-  build_raster_renderer:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Build
-        run: cargo build --verbose --features raster-renderer
-      - name: Run tests
-        run: cargo test --verbose --features raster-renderer
-
-  build_fluffy_stuff_tile_sets:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Build
-        run: cargo build --verbose --features raster-renderer,fluffy-stuff-tile-sets
-      - name: Run tests
-        run: cargo test --verbose --features raster-renderer,fluffy-stuff-tile-sets
-
-  build_martin_persson_tile_sets:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-      - name: Build
-        run: cargo build --verbose --features raster-renderer,martin-persson-tile-sets
-      - name: Run tests
-        run: cargo test --verbose --features raster-renderer,martin-persson-tile-sets
+      - name: Test
+        run: cargo +${{ matrix.rust }} test --features=${{ matrix.features }}
 
   clippy:
     runs-on: ubuntu-latest
+    needs: [ "build" ]
     steps:
-      - uses: actions/checkout@v3
-      - run: rustup component add clippy
-      - uses: actions-rs/clippy-check@v1
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          args: --all-features
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-debug-${{ hashFiles('**/Cargo.toml') }}
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@beta
+        with:
+          components: clippy
+
+      - name: Run clippy
+        run: cargo clippy -- -Dclippy::all
 
   coverage:
     runs-on: ubuntu-latest
+    needs: [ "build" ]
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v3
         with:
-          toolchain: nightly-2023-06-16
-          override: true
-      - uses: actions-rs/cargo@v1
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-debug-${{ hashFiles('**/Cargo.toml') }}
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
         with:
-          command: test
-          args: --all-features --no-fail-fast
+          toolchain: nightly
+          components: llvm-tools-preview
+
+      - name: Test
+        run: cargo test --all-features --no-fail-fast
         env:
           CARGO_INCREMENTAL: '0'
-          RUSTFLAGS: '-Zprofile -Cinstrument-coverage -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests'
-          RUSTDOCFLAGS: '-Zprofile -Cinstrument-coverage -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests'
-      - id: coverage
-        uses: actions-rs/grcov@v0.1
-      - uses: codecov/codecov-action@v2
+          RUSTFLAGS: '-Cinstrument-coverage'
+
+      - name: Install grcov
+        run: if [[ ! -e ~/.cargo/bin/grcov ]]; then cargo install grcov; fi
+
+      - name: Run grcov
+        run: grcov . --binary-path target/debug/deps/ -s . -t lcov --branch --ignore-not-existing --ignore '../**' --ignore '/*' -o coverage.lcov
+
+      - uses: codecov/codecov-action@v3
         with:
+          files: ./coverage.lcov
+          flags: rust
+          fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ${{ steps.coverage.outputs.report }}
 
   rustfmt:
     runs-on: ubuntu-latest
+    needs: [ "build" ]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v3
         with:
-          toolchain: nightly
-          override: true
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-debug-${{ hashFiles('**/Cargo.toml') }}
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
           components: rustfmt
-      - name: Run rustfmt check
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: -- --check
+
+      - name: Run fmt
+        run: cargo fmt --all -- --check
