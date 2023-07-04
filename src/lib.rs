@@ -2,19 +2,20 @@
 //!
 //! This currently includes:
 //! * Hand representation object
-//! * Parser that allows to quickly create a hand using human-readable string, such as
-//!     `123m456p_7*77z`
-//! * Renderer that allows to draw a hand to a raster image (along with a few ready-to-use
-//!     sets of tile images)
+//! * Parser that allows to quickly create a hand using human-readable string,
+//!   such as `123m456p_7*77z`
+//! * Renderer that allows to draw a hand to a raster image (along with a few
+//!   ready-to-use sets of tile images)
 //!
 //! ## Feature flags
-//! By default, all the crate features are enabled. You can disable some of them on demand to save
-//! on the compilation time and resulting library size.
+//! By default, all the crate features are enabled. You can disable some of them
+//! on demand to save on the compilation time and resulting library size.
 //!
 //! * `raster-renderer` - renderer for hands that outputs raster images
-//! * `fluffy-stuff-tile-sets` - ready-to-use tile sets based on FluffyStuff's work. Greatly
-//!     increases build time
-//! * `martin-persson-tile-sets` - ready-to-use tile sets based on Martin Persson's work
+//! * `fluffy-stuff-tile-sets` - ready-to-use tile sets based on FluffyStuff's
+//!   work. Greatly increases build time
+//! * `martin-persson-tile-sets` - ready-to-use tile sets based on Martin
+//!   Persson's work
 //!
 //! ## Example
 //! ```
@@ -44,8 +45,8 @@ pub use hand::*;
 
 mod hand;
 
-/// Hand parser that is able to convert string representation of a hand (e.g. `123m456p_7*77z`)
-/// into [Hand] instance
+/// Hand parser that is able to convert string representation of a hand (e.g.
+/// `123m456p_7*77z`) into [Hand] instance
 pub mod parser;
 
 #[cfg(feature = "raster-renderer")]

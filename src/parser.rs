@@ -31,17 +31,18 @@ pub struct HandParser {
 
 impl HandParser {
     #[inline]
-    /// Parses given hand representation and returns [Hand] instance, or error, if the hand string
-    /// is invalid.
+    /// Parses given hand representation and returns [Hand] instance, or error,
+    /// if the hand string is invalid.
     ///
     /// # Format
     /// A hand can be made of following parts:
     /// * `1`, `2`, `3`, ..., `9` - tile values
-    /// * `m`, `p`, `s`, `z` (manzu, pinzu, souzu, honor) - tile suites, used as tile value prefixes
+    /// * `m`, `p`, `s`, `z` (manzu, pinzu, souzu, honor) - tile suites, used as
+    ///   tile value prefixes
     /// * `E`, `S`, `W`, `N` - winds
     /// * `w`, `g`, `r` - dragons
-    /// * `*` or `**` - tile value prefix that means that a tile is rotated (single asterisk) or
-    ///     rotated and shifted (double asterisk)
+    /// * `*` or `**` - tile value prefix that means that a tile is rotated
+    ///   (single asterisk) or rotated and shifted (double asterisk)
     /// * `_` - tile group separator
     ///
     /// # Examples
@@ -256,7 +257,8 @@ pub enum HandParseErrorType {
     InvalidCharacter,
     /// Invalid tile value provided (e.g. `9z`).
     InvalidValue,
-    /// Some tile values without any suite are left at the end of the string (e.g. `123m456`).
+    /// Some tile values without any suite are left at the end of the string
+    /// (e.g. `123m456`).
     UnfinishedSuite,
     /// Position modifier was used without any tile to modify (e.g. `**123m`).
     PositionModifierWithNoTile,
@@ -287,8 +289,7 @@ impl Display for HandParseErrorType {
 
 #[cfg(test)]
 mod tests {
-    use crate::parser::HandParser;
-    use crate::parser::{HandParseError, HandParseErrorType};
+    use crate::parser::{HandParseError, HandParseErrorType, HandParser};
     use crate::tiles::*;
     use crate::{HandTile, Tile, TilePlacement};
 

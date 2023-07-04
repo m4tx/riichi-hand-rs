@@ -14,8 +14,7 @@ mod tile_set_render {
     use std::{env, fs};
 
     use image::RgbaImage;
-    use rayon::prelude::IntoParallelIterator;
-    use rayon::prelude::ParallelIterator;
+    use rayon::prelude::{IntoParallelIterator, ParallelIterator};
     use usvg::TreeParsing;
 
     const TILE_SETS: [&str; 3] = ["Yellow", "Red", "Black"];

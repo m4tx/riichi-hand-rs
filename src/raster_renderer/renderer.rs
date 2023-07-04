@@ -1,6 +1,7 @@
-use image::{imageops, GenericImage, ImageBuffer, Rgba, RgbaImage};
 use std::error::Error;
 use std::fmt::{Display, Formatter};
+
+use image::{imageops, GenericImage, ImageBuffer, Rgba, RgbaImage};
 
 use crate::raster_renderer::tile_set::{TileImageRetrieveError, TileSet};
 use crate::TilePlacement::{Normal, Rotated, RotatedAndShifted};
@@ -199,9 +200,7 @@ mod tests {
     use crate::raster_renderer::fluffy_stuff_tile_sets::YELLOW_FLUFFY_STUFF_TILE_SET;
     #[cfg(feature = "martin-persson-tile-sets")]
     use crate::raster_renderer::martin_persson_tile_sets::MARTIN_PERSSON_TILE_SET;
-
     use crate::raster_renderer::renderer::{RasterRenderer, RenderOptions, TileWidthRatio};
-
     use crate::tiles::*;
     use crate::TilePlacement::{Normal, Rotated, RotatedAndShifted};
     use crate::{Hand, HandTile};
@@ -218,7 +217,8 @@ mod tests {
 
         let expected = load_expected_image(include_bytes!("expected_render_fluffy_stuff.png"));
 
-        // assert! instead of assert_eq! to avoid lengthy error messages containing diffs
+        // assert! instead of assert_eq! to avoid lengthy error messages containing
+        // diffs
         assert!(buffer == expected, "actual and expected images differ");
     }
 
@@ -234,7 +234,8 @@ mod tests {
 
         let expected = load_expected_image(include_bytes!("expected_render_martin_persson.png"));
 
-        // assert! instead of assert_eq! to avoid lengthy error messages containing diffs
+        // assert! instead of assert_eq! to avoid lengthy error messages containing
+        // diffs
         assert!(buffer == expected, "actual and expected images differ");
     }
 

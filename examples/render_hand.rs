@@ -1,7 +1,8 @@
+use std::io;
+
 use riichi_hand::parser::HandParser;
 use riichi_hand::raster_renderer::fluffy_stuff_tile_sets::YELLOW_FLUFFY_STUFF_TILE_SET;
 use riichi_hand::raster_renderer::{RasterRenderer, RenderOptions};
-use std::io;
 
 fn main() {
     println!("Loading the tile set...");

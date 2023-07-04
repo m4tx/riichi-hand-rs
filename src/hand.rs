@@ -140,8 +140,8 @@ pub enum TilePlacement {
 
 impl TilePlacement {
     #[inline]
-    /// Returns next placement option in order, i.e. normal => rotated => rotated and shifted
-    /// => normal.
+    /// Returns next placement option in order, i.e. normal => rotated =>
+    /// rotated and shifted => normal.
     pub fn next(&self) -> TilePlacement {
         match self {
             TilePlacement::Normal => TilePlacement::Rotated,
@@ -190,7 +190,8 @@ pub type HandGroup = Vec<HandTile>;
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 /// Hand object representation.
 ///
-/// A hand consists of a number of tile groups. Note that an empty group is valid.
+/// A hand consists of a number of tile groups. Note that an empty group is
+/// valid.
 pub struct Hand {
     groups: Vec<HandGroup>,
 }
@@ -209,13 +210,15 @@ impl Hand {
     }
 
     #[inline]
-    /// Returns an iterable over hand tile objects in this hand (ignoring groups).
+    /// Returns an iterable over hand tile objects in this hand (ignoring
+    /// groups).
     pub fn hand_tiles(&self) -> impl Iterator<Item = HandTile> + '_ {
         self.groups.iter().flatten().copied()
     }
 
     #[inline]
-    /// Returns an iterable over tiles in this hand (ignoring groups and tile placements).
+    /// Returns an iterable over tiles in this hand (ignoring groups and tile
+    /// placements).
     pub fn tiles(&self) -> impl Iterator<Item = Tile> + '_ {
         self.groups.iter().flatten().map(|x| x.tile)
     }

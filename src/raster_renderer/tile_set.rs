@@ -14,11 +14,13 @@ pub type TileImageResult = Result<RgbaImage, TileImageRetrieveError>;
 /// Set of tile images that can be used to render a hand using
 /// [RasterRenderer](super::RasterRenderer).
 pub trait TileSet {
-    /// Returns an image of given tile, taking into account the tile placement (rotation).
+    /// Returns an image of given tile, taking into account the tile placement
+    /// (rotation).
     ///
-    /// The returned image should always have dimensions `W x H` for tiles that are not rotated, and
-    /// `H x W` for the rotated versions (where W and H are the return values of `tile_width()` and
-    /// `tile_height()`, respectively)
+    /// The returned image should always have dimensions `W x H` for tiles that
+    /// are not rotated, and `H x W` for the rotated versions (where W and H
+    /// are the return values of `tile_width()` and `tile_height()`,
+    /// respectively)
     fn tile_image(&self, hand_tile: &HandTile) -> TileImageResult;
 
     /// Returns tile width, in pixels. Must be the same for all images.
@@ -80,7 +82,8 @@ impl Display for TileImageRetrieveError {
 pub enum TileSetCreationError {
     /// There is a tile missing in the image foreground map.
     TileMissing(Tile),
-    /// Images passed (both background and foregrounds) have different dimensions.
+    /// Images passed (both background and foregrounds) have different
+    /// dimensions.
     ImagesDoNotHaveEqualDimensions,
 }
 
@@ -103,8 +106,8 @@ impl Display for TileSetCreationError {
 #[derive(Debug)]
 /// An implementation of [TileSet] that expects a hash map of tile images.
 ///
-/// This implementation does not support rotated tiles. This just returns the tiles as is,
-/// returning an error if an unsupported tile is requested.
+/// This implementation does not support rotated tiles. This just returns the
+/// tiles as is, returning an error if an unsupported tile is requested.
 pub struct SimpleTileSet {
     tile_map: HashMap<Tile, RgbaImage>,
     tile_width: u32,
@@ -171,12 +174,13 @@ impl TileSet for SimpleTileSet {
 }
 
 #[derive(Debug)]
-/// An implementation of [TileSet] that expects a hash map of tile foregrounds and a single
-/// background image.
+/// An implementation of [TileSet] that expects a hash map of tile foregrounds
+/// and a single background image.
 ///
-/// This implementation automatically combines background and foreground on the fly. Also, it
-/// assumes "realistic" light for the rendered tiles (i.e. for rotated tiles, it mirrors the
-/// background, so it always seems like the light is coming from once source).
+/// This implementation automatically combines background and foreground on the
+/// fly. Also, it assumes "realistic" light for the rendered tiles (i.e. for
+/// rotated tiles, it mirrors the background, so it always seems like the light
+/// is coming from once source).
 pub struct TwoPartTileSet {
     front: RgbaImage,
     tile_map: HashMap<Tile, RgbaImage>,
@@ -185,8 +189,8 @@ pub struct TwoPartTileSet {
 }
 
 impl TwoPartTileSet {
-    /// Creates a new [TwoPartTileSet] instance using given background image and a map of tile
-    /// foregrounds.
+    /// Creates a new [TwoPartTileSet] instance using given background image and
+    /// a map of tile foregrounds.
     pub fn new(
         front: RgbaImage,
         tile_map: HashMap<Tile, RgbaImage>,
@@ -283,11 +287,11 @@ impl TileSet for TwoPartTileSet {
 mod tests {
     use std::collections::HashMap;
 
-    use crate::HandTile;
     use image::ImageBuffer;
 
     use crate::raster_renderer::{TileSet, TileSetCreationError, TwoPartTileSet};
     use crate::tiles::{ALL_TILES, ANY, II_PIN};
+    use crate::HandTile;
     use crate::TilePlacement::Normal;
 
     #[test]

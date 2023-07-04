@@ -2,10 +2,9 @@ use std::collections::HashMap;
 
 use lazy_static::lazy_static;
 
+use crate::raster_renderer::tile_set_util::*;
 use crate::raster_renderer::SimpleTileSet;
 use crate::tiles::*;
-
-use crate::raster_renderer::tile_set_util::*;
 
 macro_rules! load_tile_set {
     ($path:literal, $tile_set_name:literal) => {{
