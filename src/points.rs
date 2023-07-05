@@ -139,6 +139,7 @@ impl PointsMode {
 /// * non-dealer ron: base points × 4 paid by the discarding player,
 /// * dealer tsumo: base points × 2 paid by everyone,
 /// * dealer ron: base points × 6 paid by the discarding player.
+///
 /// Each value is rounded up to the next 100.
 ///
 /// This variant uses [`u32`] as its base to store the number of points. This is
@@ -728,7 +729,7 @@ mod tests {
 
     #[test]
     fn should_return_calculated() {
-        let points_table = include_bytes!("points_table.csv");
+        let points_table = include_bytes!("points/points_table.csv");
         let mut csv_reader = csv::Reader::from_reader(&points_table[..]);
         for result in csv_reader.deserialize() {
             let record: PointsRecord = result.unwrap();
