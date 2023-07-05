@@ -1,6 +1,9 @@
 #[cfg(all(not(feature = "raster-renderer"), feature = "fluffy-stuff-tile-sets"))]
 compile_error!("feature \"fluffy-stuff-tile-sets\" must be used with \"raster-renderer\"");
 
+#[cfg(all(not(feature = "raster-renderer"), feature = "martin-persson-tile-sets"))]
+compile_error!("feature \"martin-persson-tile-sets\" must be used with \"raster-renderer\"");
+
 fn main() {
     #[cfg(feature = "fluffy-stuff-tile-sets")]
     tile_set_render::render_tile_sets();
