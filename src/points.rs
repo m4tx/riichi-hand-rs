@@ -1,13 +1,13 @@
 use std::error::Error;
 use std::fmt::{Display, Formatter};
-use std::ops::{Add, Div, Mul, RangeFrom, RangeInclusive};
+use std::ops::{Add, Div, Mul, Neg, RangeFrom, RangeInclusive};
 
-use num_traits::Pow;
+use num_traits::{Pow, Signed};
 
 /// Number of han (big) points.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 #[repr(transparent)]
-pub struct Han(u32);
+pub struct Han(i32);
 
 impl Han {
     /// Constructs new `Han` object.
@@ -21,7 +21,7 @@ impl Han {
     /// ```
     #[inline]
     #[must_use]
-    pub const fn new(value: u32) -> Self {
+    pub const fn new(value: i32) -> Self {
         Self(value)
     }
 
@@ -36,12 +36,12 @@ impl Han {
     /// ```
     #[inline]
     #[must_use]
-    pub const fn get(&self) -> u32 {
+    pub const fn get(&self) -> i32 {
         self.0
     }
 }
 
-impl<T: Into<u32>> From<T> for Han {
+impl<T: Into<i32>> From<T> for Han {
     fn from(value: T) -> Self {
         Self::new(value.into())
     }
@@ -56,7 +56,7 @@ impl Display for Han {
 /// Number of fu (small) points.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 #[repr(transparent)]
-pub struct Fu(u32);
+pub struct Fu(i32);
 
 impl Fu {
     /// Constructs new `Fu` object.
@@ -70,7 +70,7 @@ impl Fu {
     /// ```
     #[inline]
     #[must_use]
-    pub const fn new(value: u32) -> Self {
+    pub const fn new(value: i32) -> Self {
         Self(value)
     }
 
@@ -85,12 +85,12 @@ impl Fu {
     /// ```
     #[inline]
     #[must_use]
-    pub const fn get(&self) -> u32 {
+    pub const fn get(&self) -> i32 {
         self.0
     }
 }
 
-impl<T: Into<u32>> From<T> for Fu {
+impl<T: Into<i32>> From<T> for Fu {
     fn from(value: T) -> Self {
         Self::new(value.into())
     }
@@ -142,10 +142,10 @@ impl PointsMode {
 ///
 /// Each value is rounded up to the next 100.
 ///
-/// This variant uses [`u32`] as its base to store the number of points. This is
+/// This variant uses [`i32`] as its base to store the number of points. This is
 /// more than enough for any practical uses, but if you need to use different
 /// base data type (including BigInts), you can use [`PointsCustom`].
-pub type Points = PointsCustom<u32>;
+pub type Points = PointsCustom<i32>;
 
 /// Number of (scoring) points.
 ///
@@ -164,11 +164,12 @@ pub struct PointsCustom<T> {
 impl<T> PointsCustom<T>
 where
     T: Clone,
-    T: From<u32>,
+    T: Signed,
+    T: From<i32>,
     T: PartialOrd<T>,
-    T: Add<u32, Output = T>,
-    T: Mul<u32, Output = T>,
-    T: Div<u32, Output = T>,
+    T: Add<i32, Output = T>,
+    T: Mul<i32, Output = T>,
+    T: Div<i32, Output = T>,
     T: Pow<u32, Output = T>,
 {
     /// Constructs an instance of `PointsCustom` by calculating the number of
@@ -195,8 +196,13 @@ where
         han: Han,
         fu: Fu,
     ) -> Result<Self, PointCalculationError> {
-        if calculation_mode == PointsCalculationMode::Default && !VALID_FU.contains(&fu) {
-            return Err(PointCalculationError::InvalidFu(fu));
+        if calculation_mode == PointsCalculationMode::Default {
+            if han < Han::new(1) {
+                return Err(PointCalculationError::InvalidHan(han));
+            }
+            if !VALID_FU.contains(&fu) {
+                return Err(PointCalculationError::InvalidFu(fu));
+            }
         }
 
         if calculation_mode != PointsCalculationMode::Unlimited {
@@ -213,7 +219,22 @@ where
             }
         }
 
-        let points_base = T::from(2u32).pow(han.0 + 2) * fu.0;
+        let power = han.0 + 2;
+        const MIN_USABLE_HAN: i32 = -30;
+        let points_base = if power.is_positive() {
+            T::from(2i32).pow(power as u32) * fu.0
+        } else {
+            // It's fine to operate on i32 here as using very high (as in absolute value)
+            // negative han values will result in base points number of less than 1 anyway
+            let power = power.max(MIN_USABLE_HAN).neg() as u32;
+            let multiplier = 2i32.pow(power);
+            let value = if fu.0.is_positive() {
+                (fu.0 + multiplier - 1) / multiplier
+            } else {
+                fu.0 / multiplier
+            };
+            T::from(value)
+        };
         if calculation_mode != PointsCalculationMode::Unlimited && points_base >= T::from(7900 / 4)
         {
             Ok(Self::mangan())
@@ -232,10 +253,11 @@ where
 impl<T> PointsCustom<T>
 where
     T: Clone,
-    T: From<u32>,
-    T: Add<u32, Output = T>,
-    T: Mul<u32, Output = T>,
-    T: Div<u32, Output = T>,
+    T: Signed,
+    T: From<i32>,
+    T: Add<i32, Output = T>,
+    T: Mul<i32, Output = T>,
+    T: Div<i32, Output = T>,
 {
     /// Constructs a new instance of `PointsCustom`, marking it as limited
     /// (i.e. mangan or above).
@@ -495,22 +517,28 @@ where
 #[must_use]
 fn round_up_points<T>(num: T) -> T
 where
-    T: Add<u32, Output = T>,
-    T: Mul<u32, Output = T>,
-    T: Div<u32, Output = T>,
+    T: Signed,
+    T: Add<i32, Output = T>,
+    T: Mul<i32, Output = T>,
+    T: Div<i32, Output = T>,
 {
     round_up_to(num, 100)
 }
 
 #[inline]
 #[must_use]
-fn round_up_to<T>(num: T, divisor: u32) -> T
+fn round_up_to<T>(num: T, divisor: i32) -> T
 where
-    T: Add<u32, Output = T>,
-    T: Mul<u32, Output = T>,
-    T: Div<u32, Output = T>,
+    T: Signed,
+    T: Add<i32, Output = T>,
+    T: Mul<i32, Output = T>,
+    T: Div<i32, Output = T>,
 {
-    (num + (divisor - 1)) / divisor * divisor
+    if num.is_positive() {
+        (num + (divisor - 1)) / divisor * divisor
+    } else {
+        num / divisor * divisor
+    }
 }
 
 /// The range of [`Han`] points for a Mangan hand, no matter what the Fu value
@@ -587,6 +615,9 @@ fn has_ron(han: Han, fu: Fu) -> bool {
 /// [`PointsCustom::from_calculated`] fails.
 #[derive(Debug, Copy, Clone)]
 pub enum PointCalculationError {
+    /// Invalid han value provided (below 1).
+    /// Only returned with [`PointsCalculationMode::Default`].
+    InvalidHan(Han),
     /// Invalid fu value provided (below 20, above 110, or not divisible by 5).
     /// Only returned with [`PointsCalculationMode::Default`].
     InvalidFu(Fu),
@@ -595,6 +626,9 @@ pub enum PointCalculationError {
 impl Display for PointCalculationError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
+            PointCalculationError::InvalidHan(han) => {
+                write!(f, "Han cannot be less than 1: {}", han)
+            }
             PointCalculationError::InvalidFu(fu) => {
                 write!(f, "Invalid fu value: {}", fu)
             }
@@ -606,18 +640,18 @@ impl Error for PointCalculationError {}
 
 #[cfg(test)]
 mod tests {
-    use num_bigint::BigUint;
+    use num_bigint::BigInt;
 
     use crate::points::{Fu, Han, Points, PointsCalculationMode, PointsCustom};
 
     #[derive(Debug, serde::Deserialize)]
     struct PointsRecord {
-        han: u32,
-        fu: u32,
-        ko_tsumo_1: u32,
-        ko_tsumo_2: u32,
-        ko_ron: u32,
-        oya_ron: u32,
+        han: i32,
+        fu: i32,
+        ko_tsumo_1: i32,
+        ko_tsumo_2: i32,
+        ko_ron: i32,
+        oya_ron: i32,
     }
 
     #[test]
@@ -695,6 +729,19 @@ mod tests {
         let invalid_fu = Points::from_calculated(calculation_mode, han, fu);
         let invalid_fu_error = invalid_fu.unwrap_err();
         assert_eq!(invalid_fu_error.to_string(), "Invalid fu value: 35 fu");
+    }
+
+    #[test]
+    fn should_display_invalid_han_error() {
+        let calculation_mode = PointsCalculationMode::Default;
+        let han = Han::new(-5);
+        let fu = Fu::new(30);
+        let invalid_han = Points::from_calculated(calculation_mode, han, fu);
+        let invalid_han_error = invalid_han.unwrap_err();
+        assert_eq!(
+            invalid_han_error.to_string(),
+            "Han cannot be less than 1: -5 han"
+        );
     }
 
     #[test]
@@ -779,6 +826,19 @@ mod tests {
     }
 
     #[test]
+    fn should_work_with_non_positive_numbers() {
+        check_points_unlimited(0, 30, (200, 300, 500, 800));
+        check_points_unlimited(-1, 30, (100, 200, 300, 400));
+        check_points_unlimited(-1, 70, (200, 300, 600, 900));
+        check_points_unlimited(-2, 30, (100, 100, 200, 200));
+        check_points_unlimited(-5, 30, (100, 100, 100, 100));
+        check_points_unlimited(-10, 30, (100, 100, 100, 100));
+        check_points_unlimited(4, -30, (-1900, -3800, -7600, -11500));
+        check_points_unlimited(4, -50, (-3200, -6400, -12800, -19200));
+        check_points_unlimited(-4, -100, (0, 0, -100, -100));
+    }
+
+    #[test]
     fn should_work_with_bigints_and_unlimited_mode() {
         check_points_unlimited_bigint(
             20,
@@ -808,7 +868,7 @@ mod tests {
         );
     }
 
-    fn check_points_default_limited(han: u32, fu: u32, expected_points: (u32, u32, u32, u32)) {
+    fn check_points_default_limited(han: i32, fu: i32, expected_points: (i32, i32, i32, i32)) {
         let han = Han::new(han);
         let fu = Fu::new(fu);
         let calculation_mode = PointsCalculationMode::Default;
@@ -819,7 +879,7 @@ mod tests {
         check_points(&points, han, fu, &expected_points);
     }
 
-    fn check_points_loose(han: u32, fu: u32, expected_points: (u32, u32, u32, u32)) {
+    fn check_points_loose(han: i32, fu: i32, expected_points: (i32, i32, i32, i32)) {
         let han = Han::new(han);
         let fu = Fu::new(fu);
         let calculation_mode = PointsCalculationMode::Loose;
@@ -827,7 +887,7 @@ mod tests {
         check_points(&points, han, fu, &expected_points);
     }
 
-    fn check_points_unlimited(han: u32, fu: u32, expected_points: (u32, u32, u32, u32)) {
+    fn check_points_unlimited(han: i32, fu: i32, expected_points: (i32, i32, i32, i32)) {
         let han = Han::new(han);
         let fu = Fu::new(fu);
         let calculation_mode = PointsCalculationMode::Unlimited;
@@ -835,7 +895,7 @@ mod tests {
         check_points(&points, han, fu, &expected_points);
     }
 
-    fn check_points_unlimited_bigint(han: u32, fu: u32, expected_points: (&str, &str, &str, &str)) {
+    fn check_points_unlimited_bigint(han: i32, fu: i32, expected_points: (&str, &str, &str, &str)) {
         let han = Han::new(han);
         let fu = Fu::new(fu);
         let calculation_mode = PointsCalculationMode::Unlimited;
@@ -843,7 +903,7 @@ mod tests {
         check_points_bigint(&points, han, fu, &expected_points);
     }
 
-    fn check_points(points: &Points, han: Han, fu: Fu, expected_points: &(u32, u32, u32, u32)) {
+    fn check_points(points: &Points, han: Han, fu: Fu, expected_points: &(i32, i32, i32, i32)) {
         let ko_tsumo = points.ko_tsumo().unwrap_or_default();
         let ko_ron = points.ko_ron().unwrap_or_default();
         let oya_tsumo = points.oya_tsumo().unwrap_or_default();
@@ -861,7 +921,7 @@ mod tests {
     }
 
     fn check_points_bigint(
-        points: &PointsCustom<BigUint>,
+        points: &PointsCustom<BigInt>,
         han: Han,
         fu: Fu,
         expected_points: &(&str, &str, &str, &str),
