@@ -220,20 +220,20 @@ where
         }
 
         let power = han.0 + 2;
-        const MIN_USABLE_HAN: i32 = -30;
+        const MIN_USABLE_HAN: i32 = -(i32::BITS as i32);
         let points_base = if power.is_positive() {
             T::from(2i32).pow(power as u32) * fu.0
         } else {
-            // It's fine to operate on i32 here as using very high (as in absolute value)
+            // It's fine to operate on i64 here as using very high (as in absolute value)
             // negative han values will result in base points number of less than 1 anyway
             let power = power.max(MIN_USABLE_HAN).neg() as u32;
-            let multiplier = 2i32.pow(power);
+            let multiplier = 2i64.pow(power);
             let value = if fu.0.is_positive() {
-                (fu.0 + multiplier - 1) / multiplier
+                (fu.0 as i64 + multiplier - 1) / multiplier
             } else {
-                fu.0 / multiplier
+                fu.0 as i64 / multiplier
             };
-            T::from(value)
+            T::from(value as i32)
         };
         if calculation_mode != PointsCalculationMode::Unlimited && points_base >= T::from(7900 / 4)
         {
@@ -836,6 +836,8 @@ mod tests {
         check_points_unlimited(4, -30, (-1900, -3800, -7600, -11500));
         check_points_unlimited(4, -50, (-3200, -6400, -12800, -19200));
         check_points_unlimited(-4, -100, (0, 0, -100, -100));
+        check_points_unlimited(-10000, i32::MAX, (100, 100, 100, 100));
+        check_points_unlimited(-6, i32::MAX, (134217800, 268435500, 536871000, 805306400));
     }
 
     #[test]
