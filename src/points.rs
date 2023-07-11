@@ -102,6 +102,73 @@ impl Display for Fu {
     }
 }
 
+/// Number of honbas (counter sticks).
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[repr(transparent)]
+pub struct Honbas(i32);
+
+impl Honbas {
+    /// A constant meaning zero honbas. `Honbas::ZERO` is also the default
+    /// value.
+    ///
+    /// # Examples
+    /// ```
+    /// use riichi_hand::points::Honbas;
+    ///
+    /// assert_eq!(Honbas::ZERO.get(), 0);
+    /// assert_eq!(Honbas::ZERO, Honbas::default());
+    /// ```
+    pub const ZERO: Honbas = Honbas::new(0);
+
+    /// Constructs new `Honba` object.
+    ///
+    /// # Examples
+    /// ```
+    /// use riichi_hand::points::Honbas;
+    ///
+    /// let honba = Honbas::new(2);
+    /// assert_eq!(honba.get(), 2);
+    /// ```
+    #[inline]
+    #[must_use]
+    pub const fn new(value: i32) -> Self {
+        Self(value)
+    }
+
+    /// Gets the integer value for a `Fu` object.
+    ///
+    /// # Examples
+    /// ```
+    /// use riichi_hand::points::Honbas;
+    ///
+    /// let honba = Honbas::new(2);
+    /// assert_eq!(honba.get(), 2);
+    /// ```
+    #[inline]
+    #[must_use]
+    pub const fn get(&self) -> i32 {
+        self.0
+    }
+}
+
+impl<T: Into<i32>> From<T> for Honbas {
+    fn from(value: T) -> Self {
+        Self::new(value.into())
+    }
+}
+
+impl Display for Honbas {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} honbas", self.0)
+    }
+}
+
+impl Default for Honbas {
+    fn default() -> Self {
+        Self::new(0)
+    }
+}
+
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 enum PointsMode {
     Calculated { has_tsumo: bool, has_ron: bool },
@@ -158,6 +225,7 @@ pub type Points = PointsCustom<i32>;
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct PointsCustom<T> {
     base_points: T,
+    honbas: Honbas,
     mode: PointsMode,
 }
 
@@ -195,6 +263,7 @@ where
         calculation_mode: PointsCalculationMode,
         han: Han,
         fu: Fu,
+        honbas: Honbas,
     ) -> Result<Self, PointCalculationError> {
         if calculation_mode == PointsCalculationMode::Default {
             if han < Han::new(1) {
@@ -203,19 +272,22 @@ where
             if !VALID_FU.contains(&fu) {
                 return Err(PointCalculationError::InvalidFu(fu));
             }
+            if honbas < Honbas::ZERO {
+                return Err(PointCalculationError::InvalidHonbas(honbas));
+            }
         }
 
         if calculation_mode != PointsCalculationMode::Unlimited {
             if MANGAN_HAN_RANGE.contains(&han) {
-                return Ok(Self::mangan());
+                return Ok(Self::mangan(honbas));
             } else if HANEMAN_HAN_RANGE.contains(&han) {
-                return Ok(Self::haneman());
+                return Ok(Self::haneman(honbas));
             } else if BAIMAN_HAN_RANGE.contains(&han) {
-                return Ok(Self::baiman());
+                return Ok(Self::baiman(honbas));
             } else if SANBAIMAN_HAN_RANGE.contains(&han) {
-                return Ok(Self::sanbaiman());
+                return Ok(Self::sanbaiman(honbas));
             } else if KAZOE_YAKUMAN_HAN_RANGE.contains(&han) {
-                return Ok(Self::yakuman());
+                return Ok(Self::yakuman(honbas));
             }
         }
 
@@ -237,14 +309,14 @@ where
         };
         if calculation_mode != PointsCalculationMode::Unlimited && points_base >= T::from(7900 / 4)
         {
-            Ok(Self::mangan())
+            Ok(Self::mangan(honbas))
         } else {
             let val_has_tsumo =
                 calculation_mode != PointsCalculationMode::Default || has_tsumo(han, fu);
             let val_has_ron =
                 calculation_mode != PointsCalculationMode::Default || has_ron(han, fu);
 
-            let value = Self::new_calculated(points_base, val_has_tsumo, val_has_ron);
+            let value = Self::new_calculated(points_base, val_has_tsumo, val_has_ron, honbas);
             Ok(value)
         }
     }
@@ -260,44 +332,45 @@ where
     T: Div<i32, Output = T>,
 {
     /// Constructs a new instance of `PointsCustom`, marking it as limited
-    /// (i.e. mangan or above).
+    /// (i.e. mangan or above) with given number of honbas.
     ///
     /// # Examples
     /// ```
-    /// use riichi_hand::points::Points;
+    /// use riichi_hand::points::{Honbas, Points};
     ///
-    /// let points = Points::new_limited(2000);
+    /// let points = Points::new_limited(2000, Honbas::ZERO);
     /// assert_eq!(points.is_limited(), true);
     /// assert_eq!(points.ko_ron().unwrap(), 8000);
     /// ```
     #[inline]
     #[must_use]
-    pub const fn new_limited(base_points: T) -> Self {
+    pub const fn new_limited(base_points: T, honbas: Honbas) -> Self {
         Self {
             base_points,
             mode: PointsMode::Limited,
+            honbas,
         }
     }
 
     /// Constructs a new instance of `PointsCustom` with the base points value
-    /// of 2000.
+    /// of 2000 and given number of honbas.
     ///
     /// # Examples
     /// ```
-    /// use riichi_hand::points::Points;
+    /// use riichi_hand::points::{Honbas, Points};
     ///
-    /// let points = Points::mangan();
+    /// let points = Points::mangan(Honbas::ZERO);
     /// assert_eq!(points.ko_ron().unwrap(), 8000);
     /// assert_eq!(points.is_limited(), true);
     /// ```
     #[inline]
     #[must_use]
-    pub fn mangan() -> Self {
-        Self::new_limited(2000.into())
+    pub fn mangan(honbas: Honbas) -> Self {
+        Self::new_limited(2000.into(), honbas)
     }
 
     /// Constructs a new instance of `PointsCustom` with the base points value
-    /// of 3000.
+    /// of 3000 and given number of honbas.
     ///
     /// # Examples
     /// ```
@@ -309,12 +382,12 @@ where
     /// ```
     #[inline]
     #[must_use]
-    pub fn haneman() -> Self {
-        Self::new_limited(3000.into())
+    pub fn haneman(honbas: Honbas) -> Self {
+        Self::new_limited(3000.into(), honbas)
     }
 
     /// Constructs a new instance of `PointsCustom` with the base points value
-    /// of 4000.
+    /// of 4000 and given number of honbas.
     ///
     /// # Examples
     /// ```
@@ -326,12 +399,12 @@ where
     /// ```
     #[inline]
     #[must_use]
-    pub fn baiman() -> Self {
-        Self::new_limited(4000.into())
+    pub fn baiman(honbas: Honbas) -> Self {
+        Self::new_limited(4000.into(), honbas)
     }
 
     /// Constructs a new instance of `PointsCustom` with the base points value
-    /// of 6000.
+    /// of 6000 and given number of honbas.
     ///
     /// # Examples
     /// ```
@@ -343,12 +416,12 @@ where
     /// ```
     #[inline]
     #[must_use]
-    pub fn sanbaiman() -> Self {
-        Self::new_limited(6000.into())
+    pub fn sanbaiman(honbas: Honbas) -> Self {
+        Self::new_limited(6000.into(), honbas)
     }
 
     /// Constructs a new instance of `PointsCustom` with the base points value
-    /// of 8000.
+    /// of 8000 and given number of honbas.
     ///
     /// # Examples
     /// ```
@@ -360,32 +433,39 @@ where
     /// ```
     #[inline]
     #[must_use]
-    pub fn yakuman() -> Self {
-        Self::new_limited(8000.into())
+    pub fn yakuman(honbas: Honbas) -> Self {
+        Self::new_limited(8000.into(), honbas)
     }
 
     /// Constructs a new instance of `PointsCustom`, marking it as non-limited,
     /// or calculated (i.e. below mangan).
     ///
     /// This method allows to specify whether a value for tsumo and ron is
-    /// present with `has_tsumo` and `has_ron` parameters, respectively.
+    /// present with `has_tsumo` and `has_ron` parameters, respectively. The
+    /// number of honbas is also required.
     ///
     /// # Examples
     /// ```
-    /// use riichi_hand::points::Points;
+    /// use riichi_hand::points::{Honbas, Points};
     ///
     /// // 2 han, 20 fu
-    /// let points = Points::new_calculated(320, true, false);
+    /// let points = Points::new_calculated(320, true, false, Honbas::ZERO);
     /// assert_eq!(points.is_calculated(), true);
     /// assert_eq!(points.ko_tsumo().unwrap(), (400, 700));
     /// assert_eq!(points.ko_ron().is_none(), true);
     /// ```
     #[inline]
     #[must_use]
-    pub const fn new_calculated(base_points: T, has_tsumo: bool, has_ron: bool) -> Self {
+    pub const fn new_calculated(
+        base_points: T,
+        has_tsumo: bool,
+        has_ron: bool,
+        honbas: Honbas,
+    ) -> Self {
         Self {
             base_points,
             mode: PointsMode::Calculated { has_tsumo, has_ron },
+            honbas,
         }
     }
 
@@ -442,7 +522,7 @@ where
     #[must_use]
     pub fn oya_tsumo(&self) -> Option<T> {
         if self.mode.has_tsumo() {
-            let value = round_up_points(self.base_points.clone() * 2);
+            let value = round_up_points(self.base_points.clone() * 2) + self.tsumo_honba_points();
             Some(value)
         } else {
             None
@@ -462,7 +542,7 @@ where
     #[must_use]
     pub fn oya_ron(&self) -> Option<T> {
         if self.mode.has_ron() {
-            let value = round_up_points(self.base_points.clone() * 6);
+            let value = round_up_points(self.base_points.clone() * 6) + self.ron_honba_points();
             Some(value)
         } else {
             None
@@ -484,8 +564,9 @@ where
     #[must_use]
     pub fn ko_tsumo(&self) -> Option<(T, T)> {
         if self.mode.has_tsumo() {
-            let value_ko = round_up_points(self.base_points.clone());
-            let value_oya = round_up_points(self.base_points.clone() * 2);
+            let honba_points = self.tsumo_honba_points();
+            let value_ko = round_up_points(self.base_points.clone()) + honba_points;
+            let value_oya = round_up_points(self.base_points.clone() * 2) + honba_points;
             Some((value_ko, value_oya))
         } else {
             None
@@ -505,11 +586,39 @@ where
     #[must_use]
     pub fn ko_ron(&self) -> Option<T> {
         if self.mode.has_ron() {
-            let value = round_up_points(self.base_points.clone() * 4);
+            let value = round_up_points(self.base_points.clone() * 4) + self.ron_honba_points();
             Some(value)
         } else {
             None
         }
+    }
+
+    /// Returns the number of honbas passed when creating the value.
+    ///
+    /// # Examples
+    /// ```
+    /// use riichi_hand::points::{Honbas, Points};
+    ///
+    /// let points = Points::mangan(Honbas::new(3));
+    /// assert_eq!(points.ko_ron().unwrap(), 8900);
+    /// assert_eq!(points.honbas().get(), 3);
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn honbas(&self) -> Honbas {
+        self.honbas
+    }
+
+    #[inline]
+    #[must_use]
+    fn tsumo_honba_points(&self) -> i32 {
+        self.honbas.get() * 100
+    }
+
+    #[inline]
+    #[must_use]
+    fn ron_honba_points(&self) -> i32 {
+        self.honbas.get() * 300
     }
 }
 
@@ -573,6 +682,12 @@ pub enum PointsCalculationMode {
     Unlimited,
 }
 
+impl Default for PointsCalculationMode {
+    fn default() -> Self {
+        Self::Default
+    }
+}
+
 const VALID_FU: [Fu; 11] = [
     Fu::new(20),
     Fu::new(25),
@@ -621,6 +736,9 @@ pub enum PointCalculationError {
     /// Invalid fu value provided (below 20, above 110, or not divisible by 5).
     /// Only returned with [`PointsCalculationMode::Default`].
     InvalidFu(Fu),
+    /// Invalid honba counter provided (below 0).
+    /// Only returned with [`PointsCalculationMode::Default`].
+    InvalidHonbas(Honbas),
 }
 
 impl Display for PointCalculationError {
@@ -632,6 +750,9 @@ impl Display for PointCalculationError {
             PointCalculationError::InvalidFu(fu) => {
                 write!(f, "Invalid fu value: {}", fu)
             }
+            PointCalculationError::InvalidHonbas(honbas) => {
+                write!(f, "Invalid honba count: {}", honbas)
+            }
         }
     }
 }
@@ -642,7 +763,7 @@ impl Error for PointCalculationError {}
 mod tests {
     use num_bigint::BigInt;
 
-    use crate::points::{Fu, Han, Points, PointsCalculationMode, PointsCustom};
+    use crate::points::{Fu, Han, Honbas, Points, PointsCalculationMode, PointsCustom};
 
     #[derive(Debug, serde::Deserialize)]
     struct PointsRecord {
@@ -660,65 +781,65 @@ mod tests {
         let calculation_mode = PointsCalculationMode::Default;
         let han = Han::new(1);
         let fu = Fu::new(20);
-        assert!(Points::from_calculated(calculation_mode, han, fu).is_ok());
+        assert!(Points::from_calculated(calculation_mode, han, fu, Honbas::ZERO).is_ok());
         let calculation_mode = PointsCalculationMode::Default;
         let han = Han::new(2);
         let fu = Fu::new(110);
-        assert!(Points::from_calculated(calculation_mode, han, fu).is_ok());
+        assert!(Points::from_calculated(calculation_mode, han, fu, Honbas::ZERO).is_ok());
 
         // Loose mode
         let calculation_mode = PointsCalculationMode::Loose;
         let han = Han::new(1);
         let fu = Fu::new(13);
-        assert!(Points::from_calculated(calculation_mode, han, fu).is_ok());
+        assert!(Points::from_calculated(calculation_mode, han, fu, Honbas::ZERO).is_ok());
         let calculation_mode = PointsCalculationMode::Loose;
         let han = Han::new(1);
         let fu = Fu::new(35);
-        assert!(Points::from_calculated(calculation_mode, han, fu).is_ok());
+        assert!(Points::from_calculated(calculation_mode, han, fu, Honbas::ZERO).is_ok());
         let calculation_mode = PointsCalculationMode::Loose;
         let han = Han::new(1);
         let fu = Fu::new(150);
-        assert!(Points::from_calculated(calculation_mode, han, fu).is_ok());
+        assert!(Points::from_calculated(calculation_mode, han, fu, Honbas::ZERO).is_ok());
         let calculation_mode = PointsCalculationMode::Loose;
         let han = Han::new(1);
         let fu = Fu::new(10);
-        assert!(Points::from_calculated(calculation_mode, han, fu).is_ok());
+        assert!(Points::from_calculated(calculation_mode, han, fu, Honbas::ZERO).is_ok());
 
         // Unlimited mode
         let calculation_mode = PointsCalculationMode::Unlimited;
         let han = Han::new(1);
         let fu = Fu::new(13);
-        assert!(Points::from_calculated(calculation_mode, han, fu).is_ok());
+        assert!(Points::from_calculated(calculation_mode, han, fu, Honbas::ZERO).is_ok());
         let calculation_mode = PointsCalculationMode::Unlimited;
         let han = Han::new(1);
         let fu = Fu::new(35);
-        assert!(Points::from_calculated(calculation_mode, han, fu).is_ok());
+        assert!(Points::from_calculated(calculation_mode, han, fu, Honbas::ZERO).is_ok());
         let calculation_mode = PointsCalculationMode::Unlimited;
         let han = Han::new(1);
         let fu = Fu::new(150);
-        assert!(Points::from_calculated(calculation_mode, han, fu).is_ok());
+        assert!(Points::from_calculated(calculation_mode, han, fu, Honbas::ZERO).is_ok());
         let calculation_mode = PointsCalculationMode::Unlimited;
         let han = Han::new(1);
         let fu = Fu::new(10);
-        assert!(Points::from_calculated(calculation_mode, han, fu).is_ok());
+        assert!(Points::from_calculated(calculation_mode, han, fu, Honbas::ZERO).is_ok());
 
         // Invalid fu
         let calculation_mode = PointsCalculationMode::Default;
         let han = Han::new(1);
         let fu = Fu::new(13);
-        assert!(Points::from_calculated(calculation_mode, han, fu).is_err());
+        assert!(Points::from_calculated(calculation_mode, han, fu, Honbas::ZERO).is_err());
         let calculation_mode = PointsCalculationMode::Default;
         let han = Han::new(1);
         let fu = Fu::new(35);
-        assert!(Points::from_calculated(calculation_mode, han, fu).is_err());
+        assert!(Points::from_calculated(calculation_mode, han, fu, Honbas::ZERO).is_err());
         let calculation_mode = PointsCalculationMode::Default;
         let han = Han::new(1);
         let fu = Fu::new(150);
-        assert!(Points::from_calculated(calculation_mode, han, fu).is_err());
+        assert!(Points::from_calculated(calculation_mode, han, fu, Honbas::ZERO).is_err());
         let calculation_mode = PointsCalculationMode::Default;
         let han = Han::new(1);
         let fu = Fu::new(10);
-        assert!(Points::from_calculated(calculation_mode, han, fu).is_err());
+        assert!(Points::from_calculated(calculation_mode, han, fu, Honbas::ZERO).is_err());
     }
 
     #[test]
@@ -726,7 +847,7 @@ mod tests {
         let calculation_mode = PointsCalculationMode::Default;
         let han = Han::new(1);
         let fu = Fu::new(35);
-        let invalid_fu = Points::from_calculated(calculation_mode, han, fu);
+        let invalid_fu = Points::from_calculated(calculation_mode, han, fu, Honbas::ZERO);
         let invalid_fu_error = invalid_fu.unwrap_err();
         assert_eq!(invalid_fu_error.to_string(), "Invalid fu value: 35 fu");
     }
@@ -736,11 +857,25 @@ mod tests {
         let calculation_mode = PointsCalculationMode::Default;
         let han = Han::new(-5);
         let fu = Fu::new(30);
-        let invalid_han = Points::from_calculated(calculation_mode, han, fu);
+        let invalid_han = Points::from_calculated(calculation_mode, han, fu, Honbas::ZERO);
         let invalid_han_error = invalid_han.unwrap_err();
         assert_eq!(
             invalid_han_error.to_string(),
             "Han cannot be less than 1: -5 han"
+        );
+    }
+
+    #[test]
+    fn should_display_invalid_honbas_error() {
+        let calculation_mode = PointsCalculationMode::Default;
+        let han = Han::new(3);
+        let fu = Fu::new(30);
+        let honbas = Honbas::new(-1);
+        let invalid_honbas = Points::from_calculated(calculation_mode, han, fu, honbas);
+        let invalid_honbas_error = invalid_honbas.unwrap_err();
+        assert_eq!(
+            invalid_honbas_error.to_string(),
+            "Invalid honba count: -1 honbas"
         );
     }
 
@@ -775,6 +910,16 @@ mod tests {
     }
 
     #[test]
+    fn should_handle_honbas() {
+        check_points_loose_with_honbas(1, 30, 1, (400, 600, 1300, 1800));
+        check_points_loose_with_honbas(1, 30, 5, (800, 1000, 2500, 3000));
+        check_points_loose_with_honbas(1, 30, -3, (0, 200, 100, 600));
+        check_points_loose_with_honbas(1, 30, -5, (-200, 0, -500, 0));
+        check_points_loose_with_honbas(3, 30, 10, (2000, 3000, 6900, 8800));
+        check_points_loose_with_honbas(5, 30, 1, (2100, 4100, 8300, 12300));
+    }
+
+    #[test]
     fn should_return_calculated() {
         let points_table = include_bytes!("points/points_table.csv");
         let mut csv_reader = csv::Reader::from_reader(&points_table[..]);
@@ -784,7 +929,7 @@ mod tests {
             let fu = Fu::new(record.fu);
 
             let calculation_mode = PointsCalculationMode::Default;
-            let points = Points::from_calculated(calculation_mode, han, fu).unwrap();
+            let points = Points::from_calculated(calculation_mode, han, fu, Honbas::ZERO).unwrap();
             let ko_tsumo = points.ko_tsumo().unwrap_or_default();
             let ko_ron = points.ko_ron().unwrap_or_default();
             let oya_ron = points.oya_ron().unwrap_or_default();
@@ -874,7 +1019,7 @@ mod tests {
         let han = Han::new(han);
         let fu = Fu::new(fu);
         let calculation_mode = PointsCalculationMode::Default;
-        let points = Points::from_calculated(calculation_mode, han, fu).unwrap();
+        let points = Points::from_calculated(calculation_mode, han, fu, Honbas::ZERO).unwrap();
         assert!(points.is_limited());
         assert!(!points.is_calculated());
 
@@ -882,10 +1027,20 @@ mod tests {
     }
 
     fn check_points_loose(han: i32, fu: i32, expected_points: (i32, i32, i32, i32)) {
+        check_points_loose_with_honbas(han, fu, 0, expected_points);
+    }
+
+    fn check_points_loose_with_honbas(
+        han: i32,
+        fu: i32,
+        honbas: i32,
+        expected_points: (i32, i32, i32, i32),
+    ) {
         let han = Han::new(han);
         let fu = Fu::new(fu);
+        let honbas = Honbas::new(honbas);
         let calculation_mode = PointsCalculationMode::Loose;
-        let points = Points::from_calculated(calculation_mode, han, fu).unwrap();
+        let points = Points::from_calculated(calculation_mode, han, fu, honbas).unwrap();
         check_points(&points, han, fu, &expected_points);
     }
 
@@ -893,7 +1048,7 @@ mod tests {
         let han = Han::new(han);
         let fu = Fu::new(fu);
         let calculation_mode = PointsCalculationMode::Unlimited;
-        let points = Points::from_calculated(calculation_mode, han, fu).unwrap();
+        let points = Points::from_calculated(calculation_mode, han, fu, Honbas::ZERO).unwrap();
         check_points(&points, han, fu, &expected_points);
     }
 
@@ -901,7 +1056,8 @@ mod tests {
         let han = Han::new(han);
         let fu = Fu::new(fu);
         let calculation_mode = PointsCalculationMode::Unlimited;
-        let points = PointsCustom::from_calculated(calculation_mode, han, fu).unwrap();
+        let points =
+            PointsCustom::from_calculated(calculation_mode, han, fu, Honbas::ZERO).unwrap();
         check_points_bigint(&points, han, fu, &expected_points);
     }
 
