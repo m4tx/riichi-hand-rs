@@ -47,6 +47,10 @@ fn main() {
 }
 ```
 
+This results in the following image being generated:
+
+![Test hand: 1, 2, 3 manzu, 1, 2, 3 pinzu, 1, 2, 3 souzu, 2 easts, 2 souths](docs/hand_example.png)
+
 ## Uses
 
 * [chombot](https://github.com/riichi/chombot) - Discord bot for Krakow Chombo
