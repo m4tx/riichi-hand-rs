@@ -248,15 +248,30 @@ where
     ///
     /// # Examples
     /// ```
-    /// use riichi_hand::points::{Fu, Han, Points, PointsCalculationMode};
+    /// use riichi_hand::points::{Fu, Han, Honbas, Points, PointsCalculationMode};
     ///
-    /// let points_1 = Points::from_calculated(PointsCalculationMode::Default, Han::new(4), Fu::new(30)).unwrap();
+    /// let points_1 = Points::from_calculated(
+    ///     PointsCalculationMode::Default,
+    ///     Han::new(4),
+    ///     Fu::new(30),
+    ///     Honbas::ZERO
+    /// ).unwrap();
     /// assert_eq!(points_1.ko_ron().unwrap(), 7700);
     ///
-    /// let points_2 = Points::from_calculated(PointsCalculationMode::Loose, Han::new(1), Fu::new(20)).unwrap();
+    /// let points_2 = Points::from_calculated(
+    ///     PointsCalculationMode::Loose,
+    ///     Han::new(1),
+    ///     Fu::new(20),
+    ///     Honbas::ZERO
+    /// ).unwrap();
     /// assert_eq!(points_2.ko_ron().unwrap(), 700);
     ///
-    /// let points_3 = Points::from_calculated(PointsCalculationMode::Unlimited, Han::new(15), Fu::new(50)).unwrap();
+    /// let points_3 = Points::from_calculated(
+    ///     PointsCalculationMode::Unlimited,
+    ///     Han::new(15),
+    ///     Fu::new(50),
+    ///     Honbas::ZERO
+    /// ).unwrap();
     /// assert_eq!(points_3.ko_ron().unwrap(), 26214400);
     /// ```
     pub fn from_calculated(
@@ -374,9 +389,9 @@ where
     ///
     /// # Examples
     /// ```
-    /// use riichi_hand::points::Points;
+    /// use riichi_hand::points::{Honbas, Points};
     ///
-    /// let points = Points::haneman();
+    /// let points = Points::haneman(Honbas::ZERO);
     /// assert_eq!(points.ko_ron().unwrap(), 12000);
     /// assert_eq!(points.is_limited(), true);
     /// ```
@@ -391,9 +406,9 @@ where
     ///
     /// # Examples
     /// ```
-    /// use riichi_hand::points::Points;
+    /// use riichi_hand::points::{Honbas, Points};
     ///
-    /// let points = Points::baiman();
+    /// let points = Points::baiman(Honbas::ZERO);
     /// assert_eq!(points.ko_ron().unwrap(), 16000);
     /// assert_eq!(points.is_limited(), true);
     /// ```
@@ -408,9 +423,9 @@ where
     ///
     /// # Examples
     /// ```
-    /// use riichi_hand::points::Points;
+    /// use riichi_hand::points::{Honbas, Points};
     ///
-    /// let points = Points::sanbaiman();
+    /// let points = Points::sanbaiman(Honbas::ZERO);
     /// assert_eq!(points.ko_ron().unwrap(), 24000);
     /// assert_eq!(points.is_limited(), true);
     /// ```
@@ -425,9 +440,9 @@ where
     ///
     /// # Examples
     /// ```
-    /// use riichi_hand::points::Points;
+    /// use riichi_hand::points::{Honbas, Points};
     ///
-    /// let points = Points::yakuman();
+    /// let points = Points::yakuman(Honbas::ZERO);
     /// assert_eq!(points.ko_ron().unwrap(), 32000);
     /// assert_eq!(points.is_limited(), true);
     /// ```
@@ -474,9 +489,9 @@ where
     ///
     /// # Examples
     /// ```
-    /// use riichi_hand::points::Points;
+    /// use riichi_hand::points::{Honbas, Points};
     ///
-    /// let points = Points::new_limited(2000);
+    /// let points = Points::new_limited(2000, Honbas::ZERO);
     /// assert_eq!(points.is_limited(), true);
     /// assert_eq!(points.is_calculated(), false);
     /// ```
@@ -494,9 +509,9 @@ where
     ///
     /// # Examples
     /// ```
-    /// use riichi_hand::points::Points;
+    /// use riichi_hand::points::{Honbas, Points};
     ///
-    /// let points = Points::new_calculated(640, true, false);
+    /// let points = Points::new_calculated(640, true, false, Honbas::ZERO);
     /// assert_eq!(points.is_calculated(), true);
     /// assert_eq!(points.is_limited(), false);
     /// ```
@@ -513,9 +528,9 @@ where
     ///
     /// # Examples
     /// ```
-    /// use riichi_hand::points::Points;
+    /// use riichi_hand::points::{Honbas, Points};
     ///
-    /// let points = Points::mangan();
+    /// let points = Points::mangan(Honbas::ZERO);
     /// assert_eq!(points.oya_tsumo().unwrap(), 4000);
     /// ```
     #[inline]
@@ -533,9 +548,9 @@ where
     ///
     /// # Examples
     /// ```
-    /// use riichi_hand::points::Points;
+    /// use riichi_hand::points::{Honbas, Points};
     ///
-    /// let points = Points::mangan();
+    /// let points = Points::mangan(Honbas::ZERO);
     /// assert_eq!(points.oya_ron().unwrap(), 12000);
     /// ```
     #[inline]
@@ -555,9 +570,9 @@ where
     ///
     /// # Examples
     /// ```
-    /// use riichi_hand::points::Points;
+    /// use riichi_hand::points::{Honbas, Points};
     ///
-    /// let points = Points::mangan();
+    /// let points = Points::mangan(Honbas::ZERO);
     /// assert_eq!(points.ko_tsumo().unwrap(), (2000, 4000));
     /// ```
     #[inline]
@@ -577,9 +592,9 @@ where
     ///
     /// # Examples
     /// ```
-    /// use riichi_hand::points::Points;
+    /// use riichi_hand::points::{Honbas, Points};
     ///
-    /// let points = Points::mangan();
+    /// let points = Points::mangan(Honbas::ZERO);
     /// assert_eq!(points.ko_ron().unwrap(), 8000);
     /// ```
     #[inline]
