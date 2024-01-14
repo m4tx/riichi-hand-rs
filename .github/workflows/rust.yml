@@ -2,6 +2,9 @@ name: Rust CI
 
 on:
   push:
+  pull_request:
+  schedule:
+    - cron: '0 0 * * *'
 
 env:
   CARGO_TERM_COLOR: always
@@ -16,9 +19,10 @@ jobs:
   build:
     strategy:
       matrix:
-        rust: [ "stable", "nightly" ]
-        os: [ ubuntu-latest, macos-latest, windows-2019 ]
+        rust: [ stable, nightly ]
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
         features: [ "", "raster-renderer", "raster-renderer,fluffy-stuff-tile-sets", "raster-renderer,martin-persson-tile-sets" ]
+
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout source
@@ -94,7 +98,9 @@ jobs:
           RUSTFLAGS: '-Cinstrument-coverage'
 
       - name: Install grcov
-        run: if [[ ! -e ~/.cargo/bin/grcov ]]; then cargo install grcov; fi
+        uses: baptiste0928/cargo-install@v2
+        with:
+          crate: grcov
 
       - name: Run grcov
         run: grcov . --binary-path target/debug/deps/ -s . -t lcov --branch --ignore-not-existing --ignore '../**' --ignore '/*' -o coverage.lcov
