@@ -18,7 +18,8 @@ const SPECIAL_HATSU: char = 'g';
 const SPECIAL_CHUN: char = 'r';
 const SPECIAL_ANY: char = '?';
 
-const POSITION_MODIFIER: char = '*';
+const POSITION_MODIFIER_ASTERISK: char = '*';
+const POSITION_MODIFIER_APOSTROPHE: char = '\'';
 const GROUP_SEPARATOR: char = '_';
 
 #[derive(Debug)]
@@ -41,8 +42,8 @@ impl HandParser {
     ///   tile value prefixes
     /// * `E`, `S`, `W`, `N` - winds
     /// * `w`, `g`, `r` - dragons
-    /// * `*` or `**` - tile value prefix that means that a tile is rotated
-    ///   (single asterisk) or rotated and shifted (double asterisk)
+    /// * `*` or `'` - tile value prefix that means that a tile is rotated.
+    ///   Repeat twice to rotate and shift
     /// * `_` - tile group separator
     ///
     /// # Examples
@@ -111,7 +112,9 @@ impl HandParser {
                 SUITE_MANZU | SUITE_PINZU | SUITE_SOUZU | SUITE_HONOR => self.handle_suite(char),
                 SPECIAL_TON | SPECIAL_NAN | SPECIAL_SHAA | SPECIAL_PEI | SPECIAL_HAKU
                 | SPECIAL_HATSU | SPECIAL_CHUN | SPECIAL_ANY => self.handle_special_symbol(char),
-                POSITION_MODIFIER => self.handle_position_modifier(),
+                POSITION_MODIFIER_ASTERISK | POSITION_MODIFIER_APOSTROPHE => {
+                    self.handle_position_modifier()
+                }
                 GROUP_SEPARATOR => self.handle_group_separator(),
                 _ => Err(HandParseErrorType::InvalidCharacter),
             };
@@ -391,6 +394,34 @@ mod tests {
         );
 
         let hand = HandParser::parse("EE*E**E");
+        assert!(hand.is_ok());
+        let hand = hand.unwrap();
+        assert_eq!(hand.groups().len(), 1);
+        assert_eq!(
+            hand.hand_tiles().collect::<Vec<HandTile>>(),
+            vec![
+                HandTile::new(TON, TilePlacement::Normal),
+                HandTile::new(TON, TilePlacement::Rotated),
+                HandTile::new(TON, TilePlacement::RotatedAndShifted),
+                HandTile::new(TON, TilePlacement::Normal),
+            ]
+        );
+
+        let hand = HandParser::parse("11'1''1m");
+        assert!(hand.is_ok());
+        let hand = hand.unwrap();
+        assert_eq!(hand.groups().len(), 1);
+        assert_eq!(
+            hand.hand_tiles().collect::<Vec<HandTile>>(),
+            vec![
+                HandTile::new(II_MAN, TilePlacement::Normal),
+                HandTile::new(II_MAN, TilePlacement::Rotated),
+                HandTile::new(II_MAN, TilePlacement::RotatedAndShifted),
+                HandTile::new(II_MAN, TilePlacement::Normal),
+            ]
+        );
+
+        let hand = HandParser::parse("EE'E*'E");
         assert!(hand.is_ok());
         let hand = hand.unwrap();
         assert_eq!(hand.groups().len(), 1);
