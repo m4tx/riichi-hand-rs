@@ -1,10 +1,10 @@
 riichi-hand-rs
 ==============
 
+[![Build Status](https://github.com/m4tx/riichi-hand-rs/workflows/Rust%20CI/badge.svg)](https://github.com/m4tx/riichi-hand-rs/actions)
 [![crates.io](https://img.shields.io/crates/v/riichi_hand.svg)](https://crates.io/crates/riichi_hand)
 [![Documentation](https://docs.rs/riichi_hand/badge.svg)](https://docs.rs/riichi_hand)
-[![Build Status](https://github.com/m4tx/riichi-hand-rs/workflows/Rust%20CI/badge.svg)](https://github.com/m4tx/riichi-hand-rs/actions)
-[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/m4tx/riichi-hand-rs/blob/master/LICENSE)
+[![MIT licensed](https://img.shields.io/github/license/m4tx/riichi-hand-rs)](https://github.com/m4tx/riichi-hand-rs/blob/master/LICENSE)
 [![codecov](https://codecov.io/gh/m4tx/riichi-hand-rs/branch/master/graph/badge.svg)](https://codecov.io/gh/m4tx/riichi-hand-rs)
 
 A collection of utilities for working with Riichi Mahjong player hands to use
