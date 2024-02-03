@@ -1,7 +1,7 @@
 riichi-hand-rs
 ==============
 
-[![Build Status](https://github.com/m4tx/riichi-hand-rs/workflows/Rust%20CI/badge.svg)](https://github.com/m4tx/riichi-hand-rs/actions)
+[![Rust Build Status](https://github.com/m4tx/riichi-hand-rs/workflows/Rust%20CI/badge.svg)](https://github.com/m4tx/riichi-hand-rs/actions/workflows/rust.yml)
 [![crates.io](https://img.shields.io/crates/v/riichi_hand.svg)](https://crates.io/crates/riichi_hand)
 [![Documentation](https://docs.rs/riichi_hand/badge.svg)](https://docs.rs/riichi_hand)
 [![MIT licensed](https://img.shields.io/github/license/m4tx/riichi-hand-rs)](https://github.com/m4tx/riichi-hand-rs/blob/master/LICENSE)
@@ -76,5 +76,5 @@ under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
 This project uses mahjong tiles by
 [Martin Persson](https://www.martinpersson.org/) which are free for personal
-and commercial use under the condition that a link to the author's page 
-is provided. 
+and commercial use under the condition that a link to the author's page
+is provided.
