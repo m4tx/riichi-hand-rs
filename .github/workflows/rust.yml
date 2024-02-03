@@ -105,7 +105,7 @@ jobs:
           RUSTFLAGS: "-Cinstrument-coverage"
 
       - name: Install grcov
-        uses: baptiste0928/cargo-install@v2
+        uses: baptiste0928/cargo-install@v3
         with:
           crate: grcov
 
