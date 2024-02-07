@@ -18,7 +18,7 @@ mod tile_set_render {
 
     use image::RgbaImage;
     use rayon::prelude::{IntoParallelIterator, ParallelIterator};
-    use usvg::TreeParsing;
+    use usvg::fontdb;
 
     const TILE_SETS: [&str; 3] = ["Yellow", "Red", "Black"];
     const TILE_NAMES: [&str; 37] = [
@@ -97,12 +97,19 @@ mod tile_set_render {
 
         let opt = usvg::Options::default();
         let svg_data = fs::read(path).unwrap();
-        let rtree = usvg::Tree::from_data(&svg_data, &opt).unwrap();
-        let resvg_tree = resvg::Tree::from_usvg(&rtree);
+        let rtree = {
+            let mut tree = usvg::Tree::from_data(&svg_data, &opt).unwrap();
+            tree.postprocess(
+                usvg::PostProcessingSteps::default(),
+                &fontdb::Database::new(),
+            );
+            tree
+        };
 
         let pixmap_size = rtree.size.to_int_size();
         let mut pixmap = tiny_skia::Pixmap::new(pixmap_size.width(), pixmap_size.height()).unwrap();
-        resvg_tree.render(
+        resvg::render(
+            &rtree,
             tiny_skia::Transform::from_scale(1.0 - 2.0 * margin, 1.0 - 2.0 * margin)
                 .post_translate(
                     pixmap_size.width() as f32 * margin,
