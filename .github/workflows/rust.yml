@@ -24,7 +24,7 @@ jobs:
         features:
           [
             "",
-            "raster-renderer",
+            raster-renderer,
             "raster-renderer,fluffy-stuff-tile-sets",
             "raster-renderer,martin-persson-tile-sets",
           ]
