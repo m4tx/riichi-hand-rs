@@ -98,15 +98,11 @@ mod tile_set_render {
         let opt = usvg::Options::default();
         let svg_data = fs::read(path).unwrap();
         let rtree = {
-            let mut tree = usvg::Tree::from_data(&svg_data, &opt).unwrap();
-            tree.postprocess(
-                usvg::PostProcessingSteps::default(),
-                &fontdb::Database::new(),
-            );
-            tree
+            let font_db = fontdb::Database::new();
+            usvg::Tree::from_data(&svg_data, &opt, &font_db).unwrap()
         };
 
-        let pixmap_size = rtree.size.to_int_size();
+        let pixmap_size = rtree.size().to_int_size();
         let mut pixmap = tiny_skia::Pixmap::new(pixmap_size.width(), pixmap_size.height()).unwrap();
         resvg::render(
             &rtree,
