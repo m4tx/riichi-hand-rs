@@ -1,6 +1,6 @@
 [package]
 name = "riichi_hand"
-version = "0.6.1"
+version = "0.6.2"
 authors = ["Mateusz Maćkowski <mateusz@mackowski.org>"]
 edition = "2018"
 license = "MIT"
