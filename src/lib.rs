@@ -42,6 +42,8 @@
     unused_qualifications
 )]
 
+pub use image;
+
 pub use hand::*;
 
 mod hand;
