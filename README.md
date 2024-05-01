@@ -1,10 +1,10 @@
 riichi-hand-rs
 ==============
 
+[![Rust Build Status](https://github.com/m4tx/riichi-hand-rs/workflows/Rust%20CI/badge.svg)](https://github.com/m4tx/riichi-hand-rs/actions/workflows/rust.yml)
 [![crates.io](https://img.shields.io/crates/v/riichi_hand.svg)](https://crates.io/crates/riichi_hand)
 [![Documentation](https://docs.rs/riichi_hand/badge.svg)](https://docs.rs/riichi_hand)
-[![Build Status](https://github.com/m4tx/riichi-hand-rs/workflows/Rust%20CI/badge.svg)](https://github.com/m4tx/riichi-hand-rs/actions)
-[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/m4tx/riichi-hand-rs/blob/master/LICENSE)
+[![MIT licensed](https://img.shields.io/github/license/m4tx/riichi-hand-rs)](https://github.com/m4tx/riichi-hand-rs/blob/master/LICENSE)
 [![codecov](https://codecov.io/gh/m4tx/riichi-hand-rs/branch/master/graph/badge.svg)](https://codecov.io/gh/m4tx/riichi-hand-rs)
 
 A collection of utilities for working with Riichi Mahjong player hands to use
@@ -27,7 +27,7 @@ Add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-riichi_hand = "0.6.0"
+riichi_hand = "0.6.2"
 ```
 
 On the feature flags overview, please refer to
@@ -76,5 +76,5 @@ under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
 This project uses mahjong tiles by
 [Martin Persson](https://www.martinpersson.org/) which are free for personal
-and commercial use under the condition that a link to the author's page 
-is provided. 
+and commercial use under the condition that a link to the author's page
+is provided.

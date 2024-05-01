@@ -117,7 +117,7 @@ impl<'a, T: TileSet> RasterRenderer<'a, T> {
         image: &mut I,
     ) -> Result<(), HandRenderError> {
         let tile_image = self.tile_set.tile_image(tile)?;
-        image::imageops::overlay(image, &tile_image, 0, 0);
+        imageops::overlay(image, &tile_image, 0, 0);
 
         Ok(())
     }
