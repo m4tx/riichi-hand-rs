@@ -43,6 +43,7 @@
 )]
 
 pub use hand::*;
+pub use image;
 
 mod hand;
 
