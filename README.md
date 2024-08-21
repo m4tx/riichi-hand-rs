@@ -71,8 +71,8 @@ additional terms or conditions.
 
 This project uses modified
 [riichi-mahjong-tiles](https://github.com/FluffyStuff/riichi-mahjong-tiles)
-by [FluffyStuff](https://github.com/FluffyStuff), licensed
-under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+by [FluffyStuff](https://github.com/FluffyStuff) in
+[public domain/CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/).
 
 This project uses mahjong tiles by
 [Martin Persson](https://www.martinpersson.org/) which are free for personal
