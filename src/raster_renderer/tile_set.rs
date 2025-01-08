@@ -298,10 +298,10 @@ mod tests {
     fn should_return_tile_missing_error() {
         let result = TwoPartTileSet::new(ImageBuffer::new(16, 16), HashMap::new());
         assert!(result.is_err());
-        match result.err().unwrap() {
-            TileSetCreationError::TileMissing(_) => assert!(true),
-            _ => assert!(false),
-        }
+        assert!(matches!(
+            result.err().unwrap(),
+            TileSetCreationError::TileMissing(_)
+        ));
     }
 
     #[test]
@@ -345,10 +345,10 @@ mod tests {
 
         let result = TwoPartTileSet::new(buffer1, map);
         assert!(result.is_err());
-        match result.err().unwrap() {
-            TileSetCreationError::ImagesDoNotHaveEqualDimensions => assert!(true),
-            _ => assert!(false),
-        }
+        assert!(matches!(
+            result.err().unwrap(),
+            TileSetCreationError::ImagesDoNotHaveEqualDimensions
+        ));
 
         let buffer1 = ImageBuffer::new(16, 16);
         let buffer2 = ImageBuffer::new(32, 32);
@@ -359,9 +359,9 @@ mod tests {
 
         let result = TwoPartTileSet::new(buffer2, map);
         assert!(result.is_err());
-        match result.err().unwrap() {
-            TileSetCreationError::ImagesDoNotHaveEqualDimensions => assert!(true),
-            _ => assert!(false),
-        }
+        assert!(matches!(
+            result.err().unwrap(),
+            TileSetCreationError::ImagesDoNotHaveEqualDimensions
+        ));
     }
 }

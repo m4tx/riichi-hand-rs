@@ -1,6 +1,5 @@
 use std::collections::HashMap;
-
-use lazy_static::lazy_static;
+use std::sync::LazyLock;
 
 use crate::raster_renderer::tile_set_util::*;
 use crate::raster_renderer::SimpleTileSet;
@@ -13,8 +12,6 @@ macro_rules! load_tile_set {
     }};
 }
 
-lazy_static! {
-    /// Tile set based on the Martin Persson's tiles
-    pub static ref MARTIN_PERSSON_TILE_SET: SimpleTileSet =
-        load_tile_set!("../../tilesets/", "MartinPersson");
-}
+/// Tile set based on the Martin Persson's tiles
+pub static MARTIN_PERSSON_TILE_SET: LazyLock<SimpleTileSet> =
+    LazyLock::new(|| load_tile_set!("../../tilesets/", "MartinPersson"));
