@@ -96,9 +96,7 @@ mod tile_set_render {
 
         let opt = usvg::Options::default();
         let svg_data = fs::read(path).unwrap();
-        let rtree = {
-            usvg::Tree::from_data(&svg_data, &opt).unwrap()
-        };
+        let rtree = { usvg::Tree::from_data(&svg_data, &opt).unwrap() };
 
         let pixmap_size = rtree.size().to_int_size();
         let mut pixmap = tiny_skia::Pixmap::new(pixmap_size.width(), pixmap_size.height()).unwrap();
