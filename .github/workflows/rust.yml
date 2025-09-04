@@ -19,7 +19,7 @@ jobs:
   build:
     strategy:
       matrix:
-        rust: [stable, nightly, "1.80.1"] # 1.80.1 is the MSRV
+        rust: [stable, nightly, "1.85"] # 1.85
         os: [ubuntu-latest, macos-latest, windows-latest]
         features:
           [

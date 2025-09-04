@@ -1,10 +1,10 @@
 use std::error::Error;
 use std::fmt::{Display, Formatter};
 
-use image::{imageops, GenericImage, ImageBuffer, Rgba, RgbaImage};
+use image::{GenericImage, ImageBuffer, Rgba, RgbaImage, imageops};
 
-use crate::raster_renderer::tile_set::{TileImageRetrieveError, TileSet};
 use crate::TilePlacement::{Normal, Rotated, RotatedAndShifted};
+use crate::raster_renderer::tile_set::{TileImageRetrieveError, TileSet};
 use crate::{Hand, HandGroup, HandTile};
 
 #[derive(Copy, Clone, Default, Debug)]
@@ -196,13 +196,13 @@ impl From<TileImageRetrieveError> for HandRenderError {
 mod tests {
     use image::{ImageFormat, RgbaImage};
 
+    use crate::TilePlacement::{Normal, Rotated, RotatedAndShifted};
     #[cfg(feature = "fluffy-stuff-tile-sets")]
     use crate::raster_renderer::fluffy_stuff_tile_sets::YELLOW_FLUFFY_STUFF_TILE_SET;
     #[cfg(feature = "martin-persson-tile-sets")]
     use crate::raster_renderer::martin_persson_tile_sets::MARTIN_PERSSON_TILE_SET;
     use crate::raster_renderer::renderer::{RasterRenderer, RenderOptions, TileWidthRatio};
     use crate::tiles::*;
-    use crate::TilePlacement::{Normal, Rotated, RotatedAndShifted};
     use crate::{Hand, HandTile};
 
     #[cfg(feature = "fluffy-stuff-tile-sets")]
@@ -249,7 +249,10 @@ mod tests {
         )
         .unwrap_err();
 
-        assert_eq!(error.to_string(), "could not retrieve tile image: tile rotated Ryan man not supported: this tile set does not support rotated tiles");
+        assert_eq!(
+            error.to_string(),
+            "could not retrieve tile image: tile rotated Ryan man not supported: this tile set does not support rotated tiles"
+        );
     }
 
     fn load_expected_image(expected_file: &[u8]) -> RgbaImage {

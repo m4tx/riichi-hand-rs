@@ -2,8 +2,8 @@ use std::collections::HashMap;
 use std::env;
 use std::sync::LazyLock;
 
-use crate::raster_renderer::tile_set_util::*;
 use crate::raster_renderer::TwoPartTileSet;
+use crate::raster_renderer::tile_set_util::*;
 use crate::tiles::*;
 
 macro_rules! load_tile_set {
