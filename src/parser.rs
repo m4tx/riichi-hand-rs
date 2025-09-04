@@ -319,7 +319,9 @@ mod tests {
         assert_eq!(hand.groups().len(), 1);
         assert_eq!(
             hand.tiles().collect::<Vec<Tile>>(),
-            vec![II_MAN, RYAN_MAN, SAN_MAN, SUU_MAN, UU_MAN, ROU_MAN, CHII_MAN, PAA_MAN, KYUU_MAN]
+            vec![
+                II_MAN, RYAN_MAN, SAN_MAN, SUU_MAN, UU_MAN, ROU_MAN, CHII_MAN, PAA_MAN, KYUU_MAN
+            ]
         );
 
         let hand = HandParser::parse("123p");

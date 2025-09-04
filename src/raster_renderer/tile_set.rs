@@ -4,8 +4,8 @@ use std::fmt::{Display, Formatter};
 
 use image::{ImageBuffer, RgbaImage};
 
-use crate::tiles::{ALL_TILES, ANY};
 use crate::TilePlacement::Normal;
+use crate::tiles::{ALL_TILES, ANY};
 use crate::{HandTile, Tile};
 
 /// Result of [TileSet::tile_image].
@@ -289,10 +289,10 @@ mod tests {
 
     use image::ImageBuffer;
 
-    use crate::raster_renderer::{TileSet, TileSetCreationError, TwoPartTileSet};
-    use crate::tiles::{ALL_TILES, ANY, II_PIN};
     use crate::HandTile;
     use crate::TilePlacement::Normal;
+    use crate::raster_renderer::{TileSet, TileSetCreationError, TwoPartTileSet};
+    use crate::tiles::{ALL_TILES, ANY, II_PIN};
 
     #[test]
     fn should_return_tile_missing_error() {
