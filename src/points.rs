@@ -678,11 +678,12 @@ pub const SANBAIMAN_HAN_RANGE: RangeInclusive<Han> = Han::new(11)..=Han::new(12)
 pub const KAZOE_YAKUMAN_HAN_RANGE: RangeFrom<Han> = Han::new(13)..;
 
 /// Point calculation mode for use with [`PointsCustom::from_calculated`].
-#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, Default)]
 pub enum PointsCalculationMode {
     /// Default, most strict mode. The point table is strictly followed
     /// (including missing ron/tsumo values e.g for 1 han, 20 fu), and only
     /// valid fu values can be provided.
+    #[default]
     Default,
     /// Loose mode. Contrary to the Default mode, this allows fu values to be
     /// invalid (e.g. 10 or 21), and it returns values for all possible han/fu
@@ -695,12 +696,6 @@ pub enum PointsCalculationMode {
     /// Using this mode, it might make sense to use data types from
     /// the [num-bigint](https://crates.io/crates/num-bigint) crate.
     Unlimited,
-}
-
-impl Default for PointsCalculationMode {
-    fn default() -> Self {
-        Self::Default
-    }
 }
 
 const VALID_FU: [Fu; 11] = [
