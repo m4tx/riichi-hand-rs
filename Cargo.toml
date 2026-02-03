@@ -16,7 +16,7 @@ exclude = [
     ".gitignore",
     "examples/"
 ]
-rust-version = "1.85"
+rust-version = "1.87"
 
 [dependencies]
 image = { version = "0.25.5", default-features = false, optional = true }
