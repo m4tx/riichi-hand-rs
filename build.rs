@@ -94,15 +94,16 @@ mod tile_set_render {
     fn render_svg(path: &str, margin: f32) -> RgbaImage {
         println!("cargo:rerun-if-changed={}", path);
 
-        let opt = usvg::Options::default();
+        let opt = resvg::usvg::Options::default();
         let svg_data = fs::read(path).unwrap();
-        let rtree = { usvg::Tree::from_data(&svg_data, &opt).unwrap() };
+        let rtree = { resvg::usvg::Tree::from_data(&svg_data, &opt).unwrap() };
 
         let pixmap_size = rtree.size().to_int_size();
-        let mut pixmap = tiny_skia::Pixmap::new(pixmap_size.width(), pixmap_size.height()).unwrap();
+        let mut pixmap =
+            resvg::tiny_skia::Pixmap::new(pixmap_size.width(), pixmap_size.height()).unwrap();
         resvg::render(
             &rtree,
-            tiny_skia::Transform::from_scale(1.0 - 2.0 * margin, 1.0 - 2.0 * margin)
+            resvg::tiny_skia::Transform::from_scale(1.0 - 2.0 * margin, 1.0 - 2.0 * margin)
                 .post_translate(
                     pixmap_size.width() as f32 * margin,
                     pixmap_size.height() as f32 * margin,
