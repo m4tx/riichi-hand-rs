@@ -69,4 +69,6 @@ pub(super) fn load_png_from_memory(buf: &[u8]) -> RgbaImage {
         .to_rgba8()
 }
 
-pub(super) use {load_tile, load_tile_image, load_tile_map};
+pub(super) use load_tile;
+pub(super) use load_tile_image;
+pub(super) use load_tile_map;
