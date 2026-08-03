@@ -98,19 +98,13 @@ jobs:
           toolchain: nightly
           components: llvm-tools-preview
 
-      - name: Test
-        run: cargo test --all-features --no-fail-fast
-        env:
-          CARGO_INCREMENTAL: "0"
-          RUSTFLAGS: "-Cinstrument-coverage"
-
-      - name: Install grcov
-        uses: baptiste0928/cargo-install@v3
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@v2.85.4
         with:
-          crate: grcov
+          tool: cargo-llvm-cov
 
-      - name: Run grcov
-        run: grcov . --binary-path target/debug/deps/ -s . -t lcov --branch --ignore-not-existing --ignore '../**' --ignore '/*' -o coverage.lcov
+      - name: Test with coverage
+        run: cargo llvm-cov --all-features --no-fail-fast --lcov --output-path coverage.lcov
 
       - uses: codecov/codecov-action@v7
         with:
