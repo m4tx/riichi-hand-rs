@@ -311,8 +311,9 @@ where
         let points_base = if power.is_positive() {
             T::from(2i32).pow(power as u32) * fu.0
         } else {
-            // It's fine to operate on i64 here as using very high (as in absolute value)
-            // negative han values will result in base points number of less than 1 anyway
+            // It's fine to operate on i64 here as using very high (as in
+            // absolute value) negative han values will result in
+            // base points number of less than 1 anyway
             let power = power.max(MIN_USABLE_HAN).neg() as u32;
             let multiplier = 2i64.pow(power);
             let value = if fu.0.is_positive() {
