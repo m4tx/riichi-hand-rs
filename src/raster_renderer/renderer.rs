@@ -217,8 +217,8 @@ mod tests {
 
         let expected = load_expected_image(include_bytes!("expected_render_fluffy_stuff.png"));
 
-        // assert! instead of assert_eq! to avoid lengthy error messages containing
-        // diffs
+        // assert! instead of assert_eq! to avoid lengthy error messages
+        // containing diffs
         assert!(buffer == expected, "actual and expected images differ");
     }
 
@@ -234,8 +234,8 @@ mod tests {
 
         let expected = load_expected_image(include_bytes!("expected_render_martin_persson.png"));
 
-        // assert! instead of assert_eq! to avoid lengthy error messages containing
-        // diffs
+        // assert! instead of assert_eq! to avoid lengthy error messages
+        // containing diffs
         assert!(buffer == expected, "actual and expected images differ");
     }
 
